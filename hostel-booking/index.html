@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hostel Booking System</title>
+
+  <!-- Link to our CSS file -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+  <!-- ===================== PAGE HEADER ===================== -->
+  <header class="site-header">
+    <h1>🏠 Hostel Booking System</h1>
+    <p>Fill in the form below to request a room</p>
+  </header>
+
+  <!-- ===================== MAIN CONTENT ===================== -->
+  <main class="container">
+
+    <!-- BOOKING FORM CARD -->
+    <div class="card">
+      <h2 class="card-title">Student Booking Form</h2>
+
+      <!--
+        novalidate  = turns off browser's built-in validation
+                      so OUR JavaScript validation runs instead
+      -->
+      <form id="bookingForm" novalidate>
+
+        <!-- -------- FULL NAME -------- -->
+        <div class="form-group" id="group-fullName">
+          <label for="fullName">Full Name <span class="required-star">*</span></label>
+          <input
+            type="text"
+            id="fullName"
+            placeholder="e.g. Ram Sharma"
+          />
+          <!-- Error message box (hidden by default) -->
+          <p class="error-msg" id="err-fullName"></p>
+        </div>
+
+        <!-- -------- EMAIL -------- -->
+        <div class="form-group" id="group-email">
+          <label for="email">Email Address <span class="required-star">*</span></label>
+          <input
+            type="text"
+            id="email"
+            placeholder="e.g. ram@example.com"
+          />
+          <p class="error-msg" id="err-email"></p>
+        </div>
+
+        <!-- -------- PHONE -------- -->
+        <div class="form-group" id="group-phone">
+          <label for="phone">Phone Number <span class="required-star">*</span></label>
+          <input
+            type="text"
+            id="phone"
+            placeholder="e.g. 9800000000"
+            maxlength="15"
+          />
+          <p class="error-msg" id="err-phone"></p>
+        </div>
+
+        <!-- -------- ROOM NUMBER -------- -->
+        <div class="form-group" id="group-room">
+          <label for="room">Room Number <span class="required-star">*</span></label>
+          <!--
+            Only "Available" rooms appear here.
+            "Full" rooms are NOT included in the list.
+          -->
+          <select id="room">
+            <option value="">-- Select a Room --</option>
+            <option value="101">Room 101 – Single Bed (Available)</option>
+            <option value="102">Room 102 – Double Bed (Available)</option>
+            <option value="105">Room 105 – Single Bed (Available)</option>
+            <option value="108">Room 108 – Suite (Available)</option>
+            <option value="112">Room 112 – Double Bed (Available)</option>
+            <!--
+              Room 103 and 106 are Full, so we simply don't add them.
+              Students can never see or pick a Full room.
+            -->
+          </select>
+          <p class="error-msg" id="err-room"></p>
+        </div>
+
+        <!-- -------- CHECK-IN DATE -------- -->
+        <div class="form-group" id="group-checkIn">
+          <label for="checkIn">Check-in Date <span class="required-star">*</span></label>
+          <input
+            type="date"
+            id="checkIn"
+          />
+          <p class="error-msg" id="err-checkIn"></p>
+        </div>
+
+        <!-- -------- SUBMIT BUTTON -------- -->
+        <button type="submit" class="btn-submit">Submit Booking Request</button>
+
+      </form><!-- end form -->
+
+      <!-- -------- SUCCESS MESSAGE (hidden until form is valid) -------- -->
+      <div class="success-box" id="successBox">
+        ✅ Your booking request has been submitted successfully.
+        The warden or owner will review your request.
+      </div>
+
+    </div><!-- end card -->
+
+  </main>
+
+  <!-- Link to our JavaScript file (placed at the bottom so HTML loads first) -->
+  <script src="script.js"></script>
+
+</body>
+</html>
