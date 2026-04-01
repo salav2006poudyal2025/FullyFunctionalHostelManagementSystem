@@ -13,6 +13,39 @@ const rooms = [
 ];
 
 // This array will hold all submitted bookings (stored in memory while server runs)
-const bookings = [];
+const bookings = [
+  {
+    id: 1,
+    fullName: "Ram Sharma",
+    email: "ram@example.com",
+    phone: "9800000000",
+    roomNumber: "101",
+    checkIn: "2026-04-15",
+    status: "Pending",
+    createdAt: "2026-04-01T10:00:00.000Z",
+  },
+  {
+    id: 2,
+    fullName: "Sita Devi",
+    email: "sita@example.com",
+    phone: "9800000001",
+    roomNumber: "102",
+    checkIn: "2026-04-16",
+    status: "Pending",
+    createdAt: "2026-04-01T11:00:00.000Z",
+  },
+  {
+    id: 3,
+    fullName: "Hari Prasad",
+    email: "hari@example.com",
+    phone: "9800000002",
+    roomNumber: "101",
+    checkIn: "2026-04-17",
+    status: "Approved",
+    createdAt: "2026-04-01T09:00:00.000Z",
+    actionedBy: "warden",
+    actionedAt: "2026-04-01T12:00:00.000Z",
+  },
+];
 
 module.exports = { rooms, bookings };
