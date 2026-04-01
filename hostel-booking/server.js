@@ -14,7 +14,8 @@ const bookingRoutes = require("./routes/booking");
 // Step 3: Create the Express app
 const app  = express();
 const PORT = 3000; // The port our server will listen on
-
+// Serve static files from project root (for JS/CSS/dashboard HTML)
+app.use(express.static(__dirname));
 // ─── Middleware ───────────────────────────────────────────────────────────────
 // Middleware = code that runs on EVERY request before it reaches our routes.
 
