@@ -40,7 +40,7 @@ async function fetchAllBookings() {
     lastUpdate.textContent = new Date().toLocaleString();
   } catch (err) {
     console.error("all bookings fetch error:", err);
-    allBookingsTableBody.innerHTML = '<tr><td colspan="6">Error loading bookings</td></tr>';
+    allBookingsTableBody.innerHTML = '<tr><td colspan="7">Error loading bookings</td></tr>';
   }
 }
 
@@ -94,6 +94,7 @@ function renderAllBookings(bookings) {
   bookings.forEach((booking) => {
     const actionedBy = booking.actionedBy ? booking.actionedBy : "-";
     const actionedAt = booking.actionedAt ? new Date(booking.actionedAt).toLocaleString() : "-";
+    const rejectionReason = booking.rejectionReason ? booking.rejectionReason : "-";
 
     const row = document.createElement("tr");
 
@@ -104,6 +105,7 @@ function renderAllBookings(bookings) {
       <td><span class="badge ${getStatusClass(booking.status)}">${booking.status}</span></td>
       <td>${actionedBy}</td>
       <td>${actionedAt}</td>
+      <td>${rejectionReason}</td>
     `;
 
     allBookingsTableBody.appendChild(row);
