@@ -37,9 +37,25 @@ router.get("/warden", (req, res) => {
   res.sendFile(path.join(__dirname, "..", "warden-dashboard.html"));
 });
 
+// Admin dashboard
+router.get("/admin", (req, res) => {
+  res.sendFile(path.join(__dirname, "..", "admin-dashboard.html"));
+});
+
 // API: long polling for occupancy summary
 router.get("/api/rooms", (req, res) => {
   res.json({ success: true, data: getOccupancyData() });
+});
+
+// API: get pending bookings
+router.get("/api/bookings/pending", (req, res) => {
+  const pending = bookings.filter((b) => b.status === "Pending");
+  res.json({ success: true, data: pending });
+});
+
+// API: get all bookings
+router.get("/api/bookings", (req, res) => {
+  res.json({ success: true, data: bookings });
 });
 
 // API: list students for a room
@@ -99,6 +115,10 @@ router.post("/api/bookings/:id/approve", (req, res) => {
     return res.status(404).json({ success: false, message: "Booking not found" });
   }
 
+  if (booking.status !== "Pending") {
+    return res.status(400).json({ success: false, message: "Booking already actioned" });
+  }
+
   const room = rooms.find((r) => r.roomNumber === booking.roomNumber);
   if (!room) {
     return res.status(400).json({ success: false, message: "Room does not exist" });
@@ -109,10 +129,37 @@ router.post("/api/bookings/:id/approve", (req, res) => {
   ).length;
 
   if (occupancy >= room.totalSeats) {
-    return res.status(400).json({ success: false, message: "Room is full" });
+    return res.status(400).json({ success: false, message: "This room is currently full. Approval blocked." });
   }
 
   booking.status = "Approved";
+  booking.actionedBy = req.body.actionedBy || "warden";
+  booking.actionedAt = new Date().toISOString();
+  res.json({ success: true, data: booking });
+});
+
+// API: reject a booking
+router.post("/api/bookings/:id/reject", (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  const booking = bookings.find((b) => b.id === id);
+
+  if (!booking) {
+    return res.status(404).json({ success: false, message: "Booking not found" });
+  }
+
+  if (booking.status !== "Pending") {
+    return res.status(400).json({ success: false, message: "Booking already actioned" });
+  }
+
+  const { reason } = req.body;
+  if (!reason || !reason.trim()) {
+    return res.status(400).json({ success: false, message: "Rejection reason is required" });
+  }
+
+  booking.status = "Rejected";
+  booking.rejectionReason = reason.trim();
+  booking.actionedBy = req.body.actionedBy || "warden";
+  booking.actionedAt = new Date().toISOString();
   res.json({ success: true, data: booking });
 });
 
