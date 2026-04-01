@@ -55,6 +55,9 @@ function renderPendingBookings(bookings) {
   bookings.forEach((booking) => {
     const row = document.createElement("tr");
 
+    // Check if already actioned by warden
+    const isActionedByWarden = booking.actionedBy === "warden";
+
     row.innerHTML = `
       <td>${booking.fullName}</td>
       <td>${booking.email}</td>
@@ -62,22 +65,27 @@ function renderPendingBookings(bookings) {
       <td>${booking.roomNumber}</td>
       <td>${booking.checkIn}</td>
       <td>
-        <button class="btn-success approve-btn" data-id="${booking.id}">Approve</button>
-        <button class="btn-danger reject-btn" data-id="${booking.id}">Reject</button>
+        ${isActionedByWarden ?
+          '<span class="btn-disabled">Already actioned by Warden</span>' :
+          `<button class="btn-success approve-btn" data-id="${booking.id}">Approve</button>
+           <button class="btn-danger reject-btn" data-id="${booking.id}">Reject</button>`
+        }
       </td>
     `;
 
     pendingTableBody.appendChild(row);
   });
 
-  // Add event listeners
-  document.querySelectorAll(".approve-btn").forEach(btn => {
-    btn.addEventListener("click", (e) => handleApprove(e.target.dataset.id));
-  });
+  if (!document.querySelector(".btn-disabled")) {
+    // Add event listeners only if not disabled
+    document.querySelectorAll(".approve-btn").forEach(btn => {
+      btn.addEventListener("click", (e) => handleApprove(e.target.dataset.id));
+    });
 
-  document.querySelectorAll(".reject-btn").forEach(btn => {
-    btn.addEventListener("click", (e) => handleReject(e.target.dataset.id));
-  });
+    document.querySelectorAll(".reject-btn").forEach(btn => {
+      btn.addEventListener("click", (e) => handleReject(e.target.dataset.id));
+    });
+  }
 }
 
 function renderAllBookings(bookings) {

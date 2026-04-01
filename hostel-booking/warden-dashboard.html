@@ -15,6 +15,25 @@
 
   <main class="container">
     <section class="card">
+      <h2 class="card-title">Pending Booking Requests</h2>
+      <div class="table-responsive">
+        <table id="pendingTable" class="table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Room</th>
+              <th>Check-in</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card">
       <h2 class="card-title">Room Occupancy Overview</h2>
       <div class="table-responsive">
         <table id="occupancyTable" class="table">
@@ -41,6 +60,19 @@
       <ul id="roomStudentList" class="student-list"></ul>
     </section>
   </main>
+
+  <!-- Modal for rejection reason -->
+  <div id="rejectModal" class="modal" style="display:none">
+    <div class="modal-content">
+      <h3>Reject Booking</h3>
+      <p>Provide a reason for rejection:</p>
+      <textarea id="rejectReason" rows="4" placeholder="Enter rejection reason..."></textarea>
+      <div class="modal-actions">
+        <button id="confirmReject" class="btn-danger">Reject</button>
+        <button id="cancelReject" class="btn-secondary">Cancel</button>
+      </div>
+    </div>
+  </div>
 
   <script src="warden.js"></script>
 </body>
