@@ -68,7 +68,7 @@ router.get("/admin", requireOwner, (req, res) => {
 });
 
 // API: long polling for occupancy summary
-router.get("/api/rooms", (req, res) => {
+router.get("/api/rooms", requireWardenOrOwner, (req, res) => {
   res.json({ success: true, data: getOccupancyData() });
 });
 
@@ -84,7 +84,7 @@ router.get("/api/bookings", requireOwner, (req, res) => {
 });
 
 // API: list students for a room
-router.get("/api/rooms/:roomNumber/students", (req, res) => {
+router.get("/api/rooms/:roomNumber/students", requireWardenOrOwner, (req, res) => {
   const roomNumber = req.params.roomNumber;
   const room = rooms.find((r) => r.roomNumber === roomNumber);
 
