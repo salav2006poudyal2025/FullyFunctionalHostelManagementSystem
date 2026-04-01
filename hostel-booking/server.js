@@ -32,6 +32,14 @@ app.use(session({
   saveUninitialized: false,
   cookie: { secure: false } // Set to true in production with HTTPS
 }));
+
+// Prevent caching for authenticated pages
+app.use((req, res, next) => {
+  if (req.session.user) {
+    res.set('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
+  }
+  next();
+});
 // ─── Middleware ───────────────────────────────────────────────────────────────
 // Middleware = code that runs on EVERY request before it reaches our routes.
 
