@@ -38,7 +38,8 @@ app.get("/", (req, res) => {
 app.listen(PORT, () => {
   console.log("─────────────────────────────────────────");
   console.log(`  Hostel Booking System is running!`);
-  console.log(`  Open in browser: http://localhost:${PORT}/booking`);
-  console.log(`  Admin page:      http://localhost:${PORT}/booking/all`);
+  console.log(`  Student Booking: http://localhost:${PORT}/booking`);
+  console.log(`  Warden Dashboard: http://localhost:${PORT}/booking/warden`);
+  console.log(`  Admin Dashboard: http://localhost:${PORT}/booking/admin`);
   console.log("─────────────────────────────────────────");
 });
