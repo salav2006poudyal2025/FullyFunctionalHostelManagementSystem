@@ -23,5 +23,17 @@ body { margin: 0; font-family: Inter, Segoe UI, Arial, sans-serif; background: #
 .student-list li.empty { color: #64748b; font-style: italic; }
 .btn-submit { background: #1d4ed8; color: #fff; border: 0; border-radius: 8px; padding: 10px 16px; cursor: pointer; font-size: 1rem; }
 .btn-submit:hover { background: #1e40af; }
+.btn-danger { background: #dc2626; color: #fff; border: 0; border-radius: 8px; padding: 8px 16px; cursor: pointer; font-size: 0.9rem; }
+.btn-danger:hover { background: #b91c1c; }
+.btn-success { background: #16a34a; color: #fff; border: 0; border-radius: 8px; padding: 8px 16px; cursor: pointer; font-size: 0.9rem; }
+.btn-success:hover { background: #15803d; }
+.btn-secondary { background: #6b7280; color: #fff; border: 0; border-radius: 8px; padding: 8px 16px; cursor: pointer; font-size: 0.9rem; }
+.btn-secondary:hover { background: #4b5563; }
+.btn-disabled { background: #d1d5db; color: #6b7280; cursor: not-allowed; }
 .error-msg { color: #dc2626; font-size: 0.9rem; margin-top: 4px; }
 .success-box { margin-top: 14px; padding: 12px; background: #d1fae5; border: 1px solid #10b981; border-radius: 8px; color: #065f46; display: none; }
+.modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+.modal-content { background: #fff; padding: 20px; border-radius: 10px; max-width: 500px; width: 90%; }
+.modal-content h3 { margin-top: 0; }
+.modal-content textarea { width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px; resize: vertical; }
+.modal-actions { margin-top: 16px; display: flex; gap: 10px; justify-content: flex-end; }
