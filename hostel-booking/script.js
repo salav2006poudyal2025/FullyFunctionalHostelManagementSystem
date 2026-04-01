@@ -7,6 +7,32 @@ function clearErrors() {
   document.querySelectorAll(".error-msg").forEach((el) => (el.textContent = ""));
 }
 
+const roomSelect = document.getElementById("room");
+
+async function loadRoomOptions() {
+  try {
+    const response = await fetch("/booking/api/rooms");
+    const payload = await response.json();
+
+    if (!payload.success) {
+      throw new Error(payload.message || "Could not fetch rooms");
+    }
+
+    roomSelect.innerHTML = '<option value="">-- Select a Room --</option>';
+
+    payload.data
+      .filter((room) => room.status !== "Full")
+      .forEach((room) => {
+        const option = document.createElement("option");
+        option.value = room.roomNumber;
+        option.textContent = `Room ${room.roomNumber} – ${room.seaterType} (${room.seatsLeft} seats left)`;
+        roomSelect.appendChild(option);
+      });
+  } catch (err) {
+    console.error("error loading rooms", err);
+  }
+}
+
 bookingForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   clearErrors();
@@ -15,7 +41,7 @@ bookingForm.addEventListener("submit", async (event) => {
     fullName: document.getElementById("fullName").value.trim(),
     email: document.getElementById("email").value.trim(),
     phone: document.getElementById("phone").value.trim(),
-    roomNumber: document.getElementById("room").value,
+    roomNumber: roomSelect.value,
     checkIn: document.getElementById("checkIn").value,
   };
 
