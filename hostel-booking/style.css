@@ -1,0 +1,27 @@
+/* style.css */
+* { box-sizing: border-box; }
+body { margin: 0; font-family: Inter, Segoe UI, Arial, sans-serif; background: #f5f7fb; color: #1a202c; }
+.site-header { background: linear-gradient(135deg, #1d4ed8, #2563eb); color: #fff; padding: 16px 20px; }
+.site-header h1 { margin: 0; font-size: 1.625rem; }
+.site-header p { margin: 4px 0 0; }
+.site-header a { color: #dbeafe; text-decoration: underline; }
+.container { width: min(1100px, 95%); margin: 20px auto 40px; }
+.card { background: #fff; border-radius: 10px; border: 1px solid #e2e8f0; padding: 20px; margin-bottom: 20px; box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06); }
+.card-title { font-size: 1.25rem; margin-bottom: 12px; color: #0f172a; }
+.table-responsive { overflow-x: auto; }
+.table { width: 100%; border-collapse: collapse; }
+.table th, .table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #e2e8f0; }
+.table th { color: #334155; font-weight: 600; font-size: 0.95rem; }
+.clickable-row { cursor: pointer; transition: background .2s ease; }
+.clickable-row:hover { background: #f8fafc; }
+.badge { font-weight: 600; padding: 5px 10px; border-radius: 999px; font-size: 0.8rem; display: inline-block; }
+.badge-success { background: #dcfce7; color: #166534; }
+.badge-danger { background: #fee2e2; color: #b91c1c; }
+.mt-12 { margin-top: 12px; }
+.student-list { list-style: none; margin: 0; padding: 0; }
+.student-list li { margin-bottom: 10px; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; background: #f8fafc; }
+.student-list li.empty { color: #64748b; font-style: italic; }
+.btn-submit { background: #1d4ed8; color: #fff; border: 0; border-radius: 8px; padding: 10px 16px; cursor: pointer; font-size: 1rem; }
+.btn-submit:hover { background: #1e40af; }
+.error-msg { color: #dc2626; font-size: 0.9rem; margin-top: 4px; }
+.success-box { margin-top: 14px; padding: 12px; background: #d1fae5; border: 1px solid #10b981; border-radius: 8px; color: #065f46; display: none; }
