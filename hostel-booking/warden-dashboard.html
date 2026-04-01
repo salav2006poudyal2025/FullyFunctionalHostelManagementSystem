@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Warden Occupancy Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <h1>🧑‍🏫 Warden Dashboard</h1>
+    <p>Room occupancy overview and student allocations.</p>
+    <p><a href="/booking">Back to Booking</a></p>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <h2 class="card-title">Room Occupancy Overview</h2>
+      <div class="table-responsive">
+        <table id="occupancyTable" class="table">
+          <thead>
+            <tr>
+              <th>Room Number</th>
+              <th>Seater Type</th>
+              <th>Occupied Seats</th>
+              <th>Total Seats</th>
+              <th>Seats Left</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="mt-12">
+        <span>Last updated: <strong id="lastUpdate">-</strong></span>
+      </div>
+    </section>
+
+    <section class="card" id="studentPanel" style="display:none">
+      <h2 class="card-title">Students in Room <span id="selectedRoom"></span></h2>
+      <ul id="roomStudentList" class="student-list"></ul>
+    </section>
+  </main>
+
+  <script src="warden.js"></script>
+</body>
+</html>
