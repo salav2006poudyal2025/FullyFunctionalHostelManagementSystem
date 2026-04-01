@@ -6,6 +6,31 @@ const { validateBookingForm } = require("./validation");
 
 const router = express.Router();
 
+// Auth helpers
+function requireAuth(req, res, next) {
+  if (!req.session.user) {
+    return res.redirect("/login");
+  }
+  next();
+}
+
+function requireWardenOrOwner(req, res, next) {
+  if (!req.session.user) {
+    return res.redirect("/login");
+  }
+  if (req.session.user.role !== "warden" && req.session.user.role !== "owner") {
+    return res.redirect("/" + req.session.user.role + "-dashboard");
+  }
+  next();
+}
+
+function requireOwner(req, res, next) {
+  if (!req.session.user || req.session.user.role !== "owner") {
+    return res.redirect("/login");
+  }
+  next();
+}
+
 function getOccupancyData() {
   return rooms.map((room) => {
     const approvedStudents = bookings.filter(
@@ -33,12 +58,12 @@ router.get("/", (req, res) => {
 });
 
 // Warden dashboard
-router.get("/warden", (req, res) => {
+router.get("/warden", requireWardenOrOwner, (req, res) => {
   res.sendFile(path.join(__dirname, "..", "warden-dashboard.html"));
 });
 
 // Admin dashboard
-router.get("/admin", (req, res) => {
+router.get("/admin", requireOwner, (req, res) => {
   res.sendFile(path.join(__dirname, "..", "admin-dashboard.html"));
 });
 
@@ -48,13 +73,13 @@ router.get("/api/rooms", (req, res) => {
 });
 
 // API: get pending bookings
-router.get("/api/bookings/pending", (req, res) => {
+router.get("/api/bookings/pending", requireWardenOrOwner, (req, res) => {
   const pending = bookings.filter((b) => b.status === "Pending");
   res.json({ success: true, data: pending });
 });
 
 // API: get all bookings
-router.get("/api/bookings", (req, res) => {
+router.get("/api/bookings", requireOwner, (req, res) => {
   res.json({ success: true, data: bookings });
 });
 
@@ -107,7 +132,7 @@ router.post("/api/bookings", (req, res) => {
 });
 
 // API: approve a booking
-router.post("/api/bookings/:id/approve", (req, res) => {
+router.post("/api/bookings/:id/approve", requireWardenOrOwner, (req, res) => {
   const id = parseInt(req.params.id, 10);
   const booking = bookings.find((b) => b.id === id);
 
@@ -139,7 +164,7 @@ router.post("/api/bookings/:id/approve", (req, res) => {
 });
 
 // API: reject a booking
-router.post("/api/bookings/:id/reject", (req, res) => {
+router.post("/api/bookings/:id/reject", requireWardenOrOwner, (req, res) => {
   const id = parseInt(req.params.id, 10);
   const booking = bookings.find((b) => b.id === id);
 
@@ -164,7 +189,7 @@ router.post("/api/bookings/:id/reject", (req, res) => {
 });
 
 // API: edit student record (booking)
-router.put("/api/bookings/:id", (req, res) => {
+router.put("/api/bookings/:id", requireOwner, (req, res) => {
   const id = parseInt(req.params.id, 10);
   const booking = bookings.find((b) => b.id === id);
 
@@ -189,7 +214,7 @@ router.put("/api/bookings/:id", (req, res) => {
 });
 
 // API: delete student record
-router.delete("/api/bookings/:id", (req, res) => {
+router.delete("/api/bookings/:id", requireOwner, (req, res) => {
   const id = parseInt(req.params.id, 10);
   const index = bookings.findIndex((b) => b.id === id);
 
