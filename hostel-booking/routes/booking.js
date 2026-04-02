@@ -44,6 +44,7 @@ function getOccupancyData() {
       roomNumber: room.roomNumber,
       seaterType: room.seaterType,
       totalSeats: room.totalSeats,
+      monthlyFee: room.price,
       occupiedSeats,
       seatsLeft,
       status,
