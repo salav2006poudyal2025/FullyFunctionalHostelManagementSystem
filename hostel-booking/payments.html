@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Owner Payments Management</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <h1>💰 Payments</h1>
+    <p>Track monthly fees for allocated students.</p>
+    <p>Logged in as: <strong>Owner</strong> | <a href="/booking/warden">Warden Dashboard</a> | <a href="/booking/admin">Admin Dashboard</a>
+       | <form method="POST" action="/logout" style="display:inline"><button type="submit" class="btn-secondary">Log Out</button></form>
+    </p>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <div class="table-responsive">
+        <table id="paymentTable" class="table">
+          <thead>
+            <tr>
+              <th>Student Name</th>
+              <th>Room Number</th>
+              <th>Monthly Fee</th>
+              <th>Payment Status</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="mt-12">
+        <button id="resetPayments" class="btn-danger">Reset All Payments</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="payments.js"></script>
+</body>
+</html>
