@@ -72,6 +72,46 @@ router.get("/payments", requireOwner, (req, res) => {
   res.sendFile(path.join(__dirname, "..", "payments.html"));
 });
 
+// Owner room management pages
+router.get("/rooms", requireOwner, (req, res) => {
+  res.sendFile(path.join(__dirname, "..", "rooms.html"));
+});
+
+// API: create new room
+router.post("/api/rooms", requireOwner, (req, res) => {
+  const { roomNumber, seaterType, monthlyFee } = req.body;
+
+  if (!roomNumber || typeof roomNumber !== "string") {
+    return res.status(400).json({ success: false, message: "roomNumber is required and must be a string." });
+  }
+  if (![2, 3, 4].includes(seaterType)) {
+    return res.status(400).json({ success: false, message: "seaterType must be 2, 3, or 4." });
+  }
+  if (typeof monthlyFee !== "number" || monthlyFee <= 0) {
+    return res.status(400).json({ success: false, message: "monthlyFee must be a positive number." });
+  }
+
+  const exists = rooms.some((room) => room.roomNumber === roomNumber);
+  if (exists) {
+    return res.status(400).json({ success: false, message: "A room with this number already exists." });
+  }
+
+  const nextRoomId = rooms.length ? rooms[rooms.length - 1].id + 1 : 1;
+  const newRoom = {
+    id: nextRoomId,
+    roomNumber,
+    seaterType,
+    totalSeats: seaterType,
+    price: monthlyFee,
+    occupiedSeats: 0,
+    seatsLeft: seaterType,
+    status: "Available",
+  };
+
+  rooms.push(newRoom);
+  res.status(201).json({ success: true, data: newRoom });
+});
+
 // API: long polling for occupancy summary
 router.get("/api/rooms", requireWardenOrOwner, (req, res) => {
   res.json({ success: true, data: getOccupancyData() });
