@@ -71,8 +71,13 @@ bookingForm.addEventListener("submit", async (event) => {
       successBox.style.display = "none";
     }, 3500);
 
+    // refresh available rooms right away
+    loadRoomOptions();
+
   } catch (error) {
     console.error("booking submission failed", error);
     alert("Booking submission failed. Please try again later.");
   }
 });
+
+loadRoomOptions();
