@@ -42,6 +42,7 @@ const bookings = [
     roomNumber: "101",
     checkIn: "2026-04-17",
     status: "Approved",
+    paymentStatus: "Pending",
     createdAt: "2026-04-01T09:00:00.000Z",
     actionedBy: "warden",
     actionedAt: "2026-04-01T12:00:00.000Z",
