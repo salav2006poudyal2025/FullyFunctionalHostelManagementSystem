@@ -67,6 +67,11 @@ router.get("/admin", requireOwner, (req, res) => {
   res.sendFile(path.join(__dirname, "..", "admin-dashboard.html"));
 });
 
+// Owner payments page
+router.get("/payments", requireOwner, (req, res) => {
+  res.sendFile(path.join(__dirname, "..", "payments.html"));
+});
+
 // API: long polling for occupancy summary
 router.get("/api/rooms", requireWardenOrOwner, (req, res) => {
   res.json({ success: true, data: getOccupancyData() });
@@ -81,6 +86,50 @@ router.get("/api/bookings/pending", requireWardenOrOwner, (req, res) => {
 // API: get all bookings
 router.get("/api/bookings", requireOwner, (req, res) => {
   res.json({ success: true, data: bookings });
+});
+
+// API: get payments list for approved students
+router.get("/api/payments", requireOwner, (req, res) => {
+  const allocated = bookings
+    .filter((b) => b.status === "Approved")
+    .map((b) => ({
+      id: b.id,
+      fullName: b.fullName,
+      roomNumber: b.roomNumber,
+      monthlyFee: rooms.find((r) => r.roomNumber === b.roomNumber)?.price || 0,
+      paymentStatus: b.paymentStatus || "Pending",
+    }));
+
+  res.json({ success: true, data: allocated });
+});
+
+// API: update payment status
+router.put("/api/payments/:id", requireOwner, (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  const booking = bookings.find((b) => b.id === id && b.status === "Approved");
+
+  if (!booking) {
+    return res.status(404).json({ success: false, message: "Booking not found or not approved" });
+  }
+
+  const { paymentStatus } = req.body;
+  if (!["Pending", "Complete"].includes(paymentStatus)) {
+    return res.status(400).json({ success: false, message: "Invalid payment status" });
+  }
+
+  booking.paymentStatus = paymentStatus;
+  res.json({ success: true, data: booking });
+});
+
+// API: reset all payments to Pending
+router.post("/api/payments/reset", requireOwner, (req, res) => {
+  bookings.forEach((b) => {
+    if (b.status === "Approved") {
+      b.paymentStatus = "Pending";
+    }
+  });
+
+  res.json({ success: true, message: "All payment statuses reset" });
 });
 
 // API: list students for a room
@@ -158,6 +207,7 @@ router.post("/api/bookings/:id/approve", requireWardenOrOwner, (req, res) => {
   }
 
   booking.status = "Approved";
+  booking.paymentStatus = booking.paymentStatus || "Pending";
   booking.actionedBy = req.body.actionedBy || "warden";
   booking.actionedAt = new Date().toISOString();
   res.json({ success: true, data: booking });
