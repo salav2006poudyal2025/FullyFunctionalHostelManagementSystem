@@ -158,17 +158,27 @@ router.put("/api/payments/:id", requireOwner, (req, res) => {
     return res.status(400).json({ success: false, message: "Invalid payment status" });
   }
 
+  const oldStatus = booking.paymentStatus;
   booking.paymentStatus = paymentStatus;
+
+  // Log payment status change for audit
+  console.log(`Payment status updated: Student ${booking.fullName} (${booking.id}) - ${oldStatus} -> ${paymentStatus} by owner`);
+
   res.json({ success: true, data: booking });
 });
 
 // API: reset all payments to Pending
 router.post("/api/payments/reset", requireOwner, (req, res) => {
+  const affectedCount = bookings.filter((b) => b.status === "Approved" && b.paymentStatus !== "Pending").length;
+
   bookings.forEach((b) => {
     if (b.status === "Approved") {
       b.paymentStatus = "Pending";
     }
   });
+
+  // Log bulk reset for audit
+  console.log(`Payment reset performed by owner: ${affectedCount} students reset to Pending`);
 
   res.json({ success: true, message: "All payment statuses reset" });
 });
