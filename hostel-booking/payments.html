@@ -17,6 +17,21 @@
 
   <main class="container">
     <section class="card">
+      <div id="paymentSummary" class="summary-stats" style="display: none;">
+        <div class="stat-item">
+          <span class="stat-label">Total Students:</span>
+          <span class="stat-value" id="totalStudents">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Paid:</span>
+          <span class="stat-value stat-complete" id="paidCount">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Pending:</span>
+          <span class="stat-value stat-pending" id="pendingCount">0</span>
+        </div>
+      </div>
+
       <div class="table-responsive">
         <table id="paymentTable" class="table">
           <thead>

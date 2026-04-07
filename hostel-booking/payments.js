@@ -79,8 +79,19 @@ function renderPaymentTable(students) {
 
   if (!students.length) {
     paymentTableBody.innerHTML = '<tr><td colspan="4">No approved students found</td></tr>';
+    document.getElementById("paymentSummary").style.display = "none";
     return;
   }
+
+  // Update summary statistics
+  const totalStudents = students.length;
+  const paidCount = students.filter(s => s.paymentStatus === "Complete").length;
+  const pendingCount = totalStudents - paidCount;
+
+  document.getElementById("totalStudents").textContent = totalStudents;
+  document.getElementById("paidCount").textContent = paidCount;
+  document.getElementById("pendingCount").textContent = pendingCount;
+  document.getElementById("paymentSummary").style.display = "flex";
 
   students.forEach((student) => {
     const row = document.createElement("tr");
