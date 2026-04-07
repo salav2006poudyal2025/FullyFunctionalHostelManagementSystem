@@ -4,6 +4,45 @@
 const paymentTableBody = document.querySelector("#paymentTable tbody");
 const resetPaymentsButton = document.querySelector("#resetPayments");
 
+// Notification system
+function showNotification(message, type = "info") {
+  // Remove existing notifications
+  const existing = document.querySelector(".notification");
+  if (existing) existing.remove();
+
+  const notification = document.createElement("div");
+  notification.className = `notification notification-${type}`;
+  notification.textContent = message;
+
+  notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    color: white;
+    font-weight: 500;
+    z-index: 1000;
+    animation: slideIn 0.3s ease-out;
+  `;
+
+  if (type === "success") {
+    notification.style.backgroundColor = "#16a34a";
+  } else if (type === "error") {
+    notification.style.backgroundColor = "#dc2626";
+  } else {
+    notification.style.backgroundColor = "#3b82f6";
+  }
+
+  document.body.appendChild(notification);
+
+  // Auto remove after 3 seconds
+  setTimeout(() => {
+    notification.style.animation = "slideOut 0.3s ease-in";
+    setTimeout(() => notification.remove(), 300);
+  }, 3000);
+}
+
 async function fetchPaymentData() {
   try {
     const response = await fetch("/booking/api/payments");
@@ -70,11 +109,12 @@ async function updatePaymentStatus(id, status) {
       throw new Error(payload.message || "Failed to save payment status.");
     }
 
-    // Compare and update UI if needed
+    // Show success feedback
+    showNotification("Payment status updated successfully!", "success");
     fetchPaymentData();
   } catch (err) {
     console.error("Failed to update payment status:", err);
-    alert("Payment status update failed. Please try again.");
+    showNotification("Payment status update failed. Please try again.", "error");
     fetchPaymentData();
   }
 }
@@ -94,10 +134,11 @@ resetPaymentsButton.addEventListener("click", async () => {
       throw new Error(payload.message || "Reset failed.");
     }
 
+    showNotification("All payment statuses have been reset to Pending.", "success");
     fetchPaymentData();
   } catch (err) {
     console.error("Reset payments failed:", err);
-    alert("Reset failed. Please try again.");
+    showNotification("Reset failed. Please try again.", "error");
   }
 });
 

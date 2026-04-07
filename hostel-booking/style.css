@@ -64,3 +64,14 @@ body { margin: 0; font-family: Inter, Segoe UI, Arial, sans-serif; background: #
   color: #dc2626;
   font-weight: 600;
 }
+
+/* Notification animations */
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideOut {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(100%); opacity: 0; }
+}
