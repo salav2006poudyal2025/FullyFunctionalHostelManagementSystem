@@ -190,3 +190,18 @@ resetPaymentsButton.addEventListener("click", async () => {
 });
 
 fetchPaymentData();
+
+// Keyboard shortcuts
+document.addEventListener("keydown", (event) => {
+  // Ctrl+R to reset payments
+  if (event.ctrlKey && event.key === "r") {
+    event.preventDefault();
+    resetPaymentsButton.click();
+  }
+
+  // Ctrl+L to reload payment data
+  if (event.ctrlKey && event.key === "l") {
+    event.preventDefault();
+    fetchPaymentData();
+  }
+});
