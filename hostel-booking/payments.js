@@ -8,6 +8,10 @@
 
 const paymentTableBody = document.querySelector("#paymentTable tbody");
 const resetPaymentsButton = document.querySelector("#resetPayments");
+const searchInput = document.querySelector("#searchInput");
+
+// Store original data for filtering
+let allStudents = [];
 
 // Notification system
 function showNotification(message, type = "info") {
@@ -66,6 +70,7 @@ async function fetchPaymentData() {
     }
 
     renderPaymentTable(payload.data);
+    allStudents = payload.data; // Store for filtering
   } catch (err) {
     console.error("Error loading payment data:", err);
     paymentTableBody.innerHTML = '<tr><td colspan="4">Error loading payment data. <button onclick="fetchPaymentData()">Retry</button></td></tr>';
@@ -204,4 +209,17 @@ document.addEventListener("keydown", (event) => {
     event.preventDefault();
     fetchPaymentData();
   }
+});
+
+// Search functionality
+searchInput.addEventListener("input", (event) => {
+  const searchTerm = event.target.value.toLowerCase().trim();
+  const filteredStudents = searchTerm
+    ? allStudents.filter(student =>
+        student.fullName.toLowerCase().includes(searchTerm) ||
+        student.roomNumber.toLowerCase().includes(searchTerm)
+      )
+    : allStudents;
+
+  renderPaymentTable(filteredStudents);
 });
