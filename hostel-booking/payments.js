@@ -44,6 +44,9 @@ function showNotification(message, type = "info") {
 }
 
 async function fetchPaymentData() {
+  // Show loading state
+  paymentTableBody.innerHTML = '<tr><td colspan="4">Loading payment data...</td></tr>';
+
   try {
     const response = await fetch("/booking/api/payments");
     const payload = await response.json();
@@ -55,7 +58,7 @@ async function fetchPaymentData() {
     renderPaymentTable(payload.data);
   } catch (err) {
     console.error("Error loading payment data:", err);
-    paymentTableBody.innerHTML = '<tr><td colspan="4">Error loading payment data</td></tr>';
+    paymentTableBody.innerHTML = '<tr><td colspan="4">Error loading payment data. <button onclick="fetchPaymentData()">Retry</button></td></tr>';
   }
 }
 
@@ -97,6 +100,13 @@ function renderPaymentTable(students) {
 }
 
 async function updatePaymentStatus(id, status) {
+  const selectElement = document.querySelector(`[data-id="${id}"]`);
+  const originalValue = selectElement.value;
+
+  // Disable dropdown during update
+  selectElement.disabled = true;
+  selectElement.style.opacity = "0.6";
+
   try {
     const response = await fetch(`/booking/api/payments/${id}`, {
       method: "PUT",
@@ -115,7 +125,10 @@ async function updatePaymentStatus(id, status) {
   } catch (err) {
     console.error("Failed to update payment status:", err);
     showNotification("Payment status update failed. Please try again.", "error");
-    fetchPaymentData();
+    // Revert on error
+    selectElement.value = originalValue;
+    selectElement.disabled = false;
+    selectElement.style.opacity = "1";
   }
 }
 
@@ -123,6 +136,11 @@ resetPaymentsButton.addEventListener("click", async () => {
   if (!confirm("This will reset all payment statuses to Pending. This cannot be undone. Continue?")) {
     return;
   }
+
+  // Disable button during reset
+  resetPaymentsButton.disabled = true;
+  const originalText = resetPaymentsButton.textContent;
+  resetPaymentsButton.textContent = "Resetting...";
 
   try {
     const response = await fetch("/booking/api/payments/reset", {
@@ -139,6 +157,10 @@ resetPaymentsButton.addEventListener("click", async () => {
   } catch (err) {
     console.error("Reset payments failed:", err);
     showNotification("Reset failed. Please try again.", "error");
+  } finally {
+    // Re-enable button
+    resetPaymentsButton.disabled = false;
+    resetPaymentsButton.textContent = originalText;
   }
 });
 
