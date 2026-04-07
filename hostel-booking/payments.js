@@ -1,11 +1,19 @@
 // payments.js
 // Owner-facing payment status manager.
+// Features:
+// - Displays all approved students with payment status
+// - Allows updating individual payment statuses
+// - Provides bulk reset functionality for monthly cycles
+// - Includes loading states and user feedback
 
 const paymentTableBody = document.querySelector("#paymentTable tbody");
 const resetPaymentsButton = document.querySelector("#resetPayments");
 
 // Notification system
 function showNotification(message, type = "info") {
+  // Displays temporary notifications for user feedback
+  // Types: success, error, info
+  // Removes existing notifications and auto-dismisses after 3 seconds
   // Remove existing notifications
   const existing = document.querySelector(".notification");
   if (existing) existing.remove();
@@ -44,6 +52,8 @@ function showNotification(message, type = "info") {
 }
 
 async function fetchPaymentData() {
+  // Fetches approved students with payment information from the API
+  // Displays loading state and handles errors gracefully
   // Show loading state
   paymentTableBody.innerHTML = '<tr><td colspan="4">Loading payment data...</td></tr>';
 
@@ -63,6 +73,8 @@ async function fetchPaymentData() {
 }
 
 function renderPaymentTable(students) {
+  // Renders the payment table with student data
+  // Creates dropdowns for payment status with change event listeners
   paymentTableBody.innerHTML = "";
 
   if (!students.length) {
@@ -100,6 +112,8 @@ function renderPaymentTable(students) {
 }
 
 async function updatePaymentStatus(id, status) {
+  // Updates a single student's payment status via API
+  // Shows loading state on dropdown and provides user feedback
   const selectElement = document.querySelector(`[data-id="${id}"]`);
   const originalValue = selectElement.value;
 
