@@ -38,3 +38,29 @@ body { margin: 0; font-family: Inter, Segoe UI, Arial, sans-serif; background: #
 .modal-content h3 { margin-top: 0; }
 .modal-content textarea { width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px; resize: vertical; }
 .modal-actions { margin-top: 16px; display: flex; gap: 10px; justify-content: flex-end; }
+
+/* Payment specific styles */
+.payment-select {
+  padding: 6px 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  background: #fff;
+  font-size: 0.9rem;
+  min-width: 100px;
+}
+
+.payment-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.payment-status-complete {
+  color: #16a34a;
+  font-weight: 600;
+}
+
+.payment-status-pending {
+  color: #dc2626;
+  font-weight: 600;
+}

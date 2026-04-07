@@ -31,10 +31,12 @@ function renderPaymentTable(students) {
   students.forEach((student) => {
     const row = document.createElement("tr");
 
+    const statusClass = student.paymentStatus === "Complete" ? "payment-status-complete" : "payment-status-pending";
+
     row.innerHTML = `
       <td>${student.fullName}</td>
       <td>${student.roomNumber}</td>
-      <td>${student.monthlyFee}</td>
+      <td>₹${student.monthlyFee}</td>
       <td>
         <select class="payment-select" data-id="${student.id}">
           <option value="Pending" ${student.paymentStatus === "Pending" ? "selected" : ""}>Pending</option>
