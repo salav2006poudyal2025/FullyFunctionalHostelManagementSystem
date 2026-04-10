@@ -139,12 +139,19 @@ router.post("/api/rooms", requireOwner, async (req, res) => {
 router.get("/api/rooms/:id", requireOwner, async (req, res) => {
   try {
     const id = req.params.id;
+
+    // Validate ObjectId format
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({ success: false, message: "Invalid room ID format" });
+    }
+
     const room = await Room.findById(id);
 
     if (!room) {
       return res.status(404).json({ success: false, message: "Room not found" });
     }
 
+    console.log(`Room details requested: ${room.roomNumber} by owner`);
     res.json({ success: true, data: room });
   } catch (error) {
     console.error('Error fetching room:', error);
