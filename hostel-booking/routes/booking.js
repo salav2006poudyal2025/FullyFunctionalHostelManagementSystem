@@ -104,15 +104,21 @@ router.post("/api/rooms", requireOwner, async (req, res) => {
       return res.status(400).json({ success: false, message: "monthlyFee must be a positive number." });
     }
 
+    // Trim and validate room number format
+    const trimmedRoomNumber = roomNumber.trim();
+    if (trimmedRoomNumber.length > 10) {
+      return res.status(400).json({ success: false, message: "Room number must be 10 characters or less." });
+    }
+
     // Check if room already exists
-    const existingRoom = await Room.findOne({ roomNumber: roomNumber.trim() });
+    const existingRoom = await Room.findOne({ roomNumber: trimmedRoomNumber });
     if (existingRoom) {
       return res.status(409).json({ success: false, message: "A room with this number already exists." });
     }
 
     // Create new room
     const newRoom = new Room({
-      roomNumber: roomNumber.trim(),
+      roomNumber: trimmedRoomNumber,
       seaterType,
       totalSeats: seaterType,
       price: monthlyFee,
@@ -123,7 +129,7 @@ router.post("/api/rooms", requireOwner, async (req, res) => {
 
     const savedRoom = await newRoom.save();
 
-    console.log(`Room created: ${savedRoom.roomNumber} (${savedRoom.seaterType} seater) by owner`);
+    console.log(`Room created: ${savedRoom.roomNumber} (${savedRoom.seaterType} seater, ₹${savedRoom.price}) by owner`);
 
     res.status(201).json({ success: true, data: savedRoom });
   } catch (error) {
