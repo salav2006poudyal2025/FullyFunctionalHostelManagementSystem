@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Management - Hostel Owner</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Room Management</h1>
+            <div class="user-info">
+                <span>Logged in as: Owner</span>
+                <a href="/logout" class="logout-btn">Logout</a>
+            </div>
+        </header>
+
+        <nav>
+            <a href="/owner-dashboard">Dashboard</a>
+            <a href="/payments">Payments</a>
+            <a href="/rooms" class="active">Rooms</a>
+        </nav>
+
+        <main>
+            <div class="section">
+                <div class="section-header">
+                    <h2>All Rooms</h2>
+                    <button id="refreshBtn" class="btn-secondary">Refresh</button>
+                </div>
+
+                <div id="loading" class="loading">Loading rooms...</div>
+
+                <table id="roomsTable" class="data-table" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th>Room Number</th>
+                            <th>Type</th>
+                            <th>Total Seats</th>
+                            <th>Occupied</th>
+                            <th>Available</th>
+                            <th>Monthly Fee</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="roomsTableBody">
+                        <!-- Room rows will be inserted here -->
+                    </tbody>
+                </table>
+
+                <div id="noRooms" class="no-data" style="display: none;">
+                    <p>No rooms found. <a href="#" id="createRoomLink">Create your first room</a></p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h3>Confirm Delete</h3>
+            <p id="deleteMessage"></p>
+            <div class="modal-actions">
+                <button id="cancelDelete" class="btn-secondary">Cancel</button>
+                <button id="confirmDelete" class="btn-danger">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast" style="display: none;">
+        <span id="toastMessage"></span>
+    </div>
+
+    <script src="rooms.js"></script>
+</body>
+</html>

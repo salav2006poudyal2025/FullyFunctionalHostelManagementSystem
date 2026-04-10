@@ -247,6 +247,59 @@ router.put("/api/rooms/:id", requireOwner, async (req, res) => {
   }
 });
 
+// API: delete room
+router.delete("/api/rooms/:id", requireOwner, async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    // Validate ObjectId format
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({ success: false, message: "Invalid room ID format" });
+    }
+
+    const room = await Room.findById(id);
+    if (!room) {
+      return res.status(404).json({ success: false, message: "Room not found" });
+    }
+
+    // Check if room has approved students
+    const approvedBookings = await Booking.countDocuments({
+      roomNumber: room.roomNumber,
+      status: "Approved"
+    });
+
+    if (approvedBookings > 0) {
+      return res.status(400).json({
+        success: false,
+        message: `Cannot delete room ${room.roomNumber}. It currently has ${approvedBookings} approved student(s).`
+      });
+    }
+
+    // Check if room has pending bookings
+    const pendingBookings = await Booking.countDocuments({
+      roomNumber: room.roomNumber,
+      status: "Pending"
+    });
+
+    if (pendingBookings > 0) {
+      return res.status(400).json({
+        success: false,
+        message: `Cannot delete room ${room.roomNumber}. It has ${pendingBookings} pending booking request(s).`
+      });
+    }
+
+    // Delete the room
+    await Room.findByIdAndDelete(id);
+
+    console.log(`Room deleted: ${room.roomNumber} by owner`);
+
+    res.json({ success: true, message: "Room deleted successfully" });
+  } catch (error) {
+    console.error('Error deleting room:', error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+});
+
 // API: long polling for occupancy summary
 router.get("/api/rooms", requireWardenOrOwner, async (req, res) => {
   try {
