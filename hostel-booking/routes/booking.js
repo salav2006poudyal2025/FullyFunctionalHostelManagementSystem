@@ -184,6 +184,9 @@ router.put("/api/rooms/:id", requireOwner, async (req, res) => {
     if (monthlyFee !== undefined && (typeof monthlyFee !== "number" || monthlyFee <= 0)) {
       return res.status(400).json({ success: false, message: "monthlyFee must be a positive number." });
     }
+    if (monthlyFee !== undefined && monthlyFee > 50000) {
+      return res.status(400).json({ success: false, message: "monthlyFee cannot exceed ₹50,000." });
+    }
 
     // Check if at least one field is provided
     if (seaterType === undefined && monthlyFee === undefined) {
