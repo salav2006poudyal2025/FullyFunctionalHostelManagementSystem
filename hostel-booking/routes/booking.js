@@ -166,6 +166,11 @@ router.put("/api/rooms/:id", requireOwner, async (req, res) => {
       return res.status(400).json({ success: false, message: "monthlyFee must be a positive number." });
     }
 
+    // Check if at least one field is provided
+    if (seaterType === undefined && monthlyFee === undefined) {
+      return res.status(400).json({ success: false, message: "At least one field (seaterType or monthlyFee) must be provided for update." });
+    }
+
     // Find the room
     const room = await Room.findById(id);
     if (!room) {
