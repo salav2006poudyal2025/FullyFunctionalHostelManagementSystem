@@ -25,12 +25,26 @@ A Node.js/Express backend API for hostel booking management system.
    npm install
    ```
 
-2. Start the server:
+2. Install and start MongoDB:
+   - MongoDB should be running on `mongodb://localhost:27017`
+
+3. Seed the database with initial data:
+   ```bash
+   npm run seed
+   ```
+
+4. Start the server:
    ```bash
    npm start
    ```
 
-3. API available at `http://localhost:3000`
+5. API available at `http://localhost:3000`
+
+## Database
+
+- **MongoDB Database**: `hostel-booking`
+- **Collections**: `rooms`, `bookings`
+- **ODM**: Mongoose for schema validation and data modeling
 
 ## Authentication
 
