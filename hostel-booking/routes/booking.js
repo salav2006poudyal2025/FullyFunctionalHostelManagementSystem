@@ -163,6 +163,12 @@ router.get("/api/rooms/:id", requireOwner, async (req, res) => {
 router.put("/api/rooms/:id", requireOwner, async (req, res) => {
   try {
     const id = req.params.id;
+
+    // Validate ObjectId format
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({ success: false, message: "Invalid room ID format" });
+    }
+
     const { seaterType, monthlyFee } = req.body;
 
     // Validation
@@ -200,6 +206,15 @@ router.put("/api/rooms/:id", requireOwner, async (req, res) => {
       }
     }
 
+    // Track changes for logging
+    const changes = [];
+    if (seaterType !== undefined && seaterType !== room.seaterType) {
+      changes.push(`seaterType: ${room.seaterType} → ${seaterType}`);
+    }
+    if (monthlyFee !== undefined && monthlyFee !== room.price) {
+      changes.push(`monthlyFee: ₹${room.price} → ₹${monthlyFee}`);
+    }
+
     // Update room fields
     if (seaterType !== undefined) {
       room.seaterType = seaterType;
@@ -214,7 +229,7 @@ router.put("/api/rooms/:id", requireOwner, async (req, res) => {
 
     const updatedRoom = await room.save();
 
-    console.log(`Room updated: ${updatedRoom.roomNumber} (${updatedRoom.seaterType} seater, ₹${updatedRoom.price}) by owner`);
+    console.log(`Room updated: ${updatedRoom.roomNumber} (${changes.join(', ')}) by owner`);
 
     res.json({ success: true, data: updatedRoom });
   } catch (error) {
