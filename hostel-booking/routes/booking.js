@@ -135,6 +135,82 @@ router.post("/api/rooms", requireOwner, async (req, res) => {
   }
 });
 
+// API: get single room details
+router.get("/api/rooms/:id", requireOwner, async (req, res) => {
+  try {
+    const id = req.params.id;
+    const room = await Room.findById(id);
+
+    if (!room) {
+      return res.status(404).json({ success: false, message: "Room not found" });
+    }
+
+    res.json({ success: true, data: room });
+  } catch (error) {
+    console.error('Error fetching room:', error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+});
+
+// API: update room details
+router.put("/api/rooms/:id", requireOwner, async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { seaterType, monthlyFee } = req.body;
+
+    // Validation
+    if (seaterType !== undefined && ![2, 3, 4].includes(seaterType)) {
+      return res.status(400).json({ success: false, message: "seaterType must be 2, 3, or 4." });
+    }
+    if (monthlyFee !== undefined && (typeof monthlyFee !== "number" || monthlyFee <= 0)) {
+      return res.status(400).json({ success: false, message: "monthlyFee must be a positive number." });
+    }
+
+    // Find the room
+    const room = await Room.findById(id);
+    if (!room) {
+      return res.status(404).json({ success: false, message: "Room not found" });
+    }
+
+    // Check capacity reduction constraint
+    if (seaterType !== undefined && seaterType < room.seaterType) {
+      // Count current approved bookings for this room
+      const approvedBookings = await Booking.countDocuments({
+        roomNumber: room.roomNumber,
+        status: "Approved"
+      });
+
+      if (approvedBookings > seaterType) {
+        return res.status(400).json({
+          success: false,
+          message: `Cannot reduce capacity to ${seaterType} seater. Room currently has ${approvedBookings} approved students.`
+        });
+      }
+    }
+
+    // Update room fields
+    if (seaterType !== undefined) {
+      room.seaterType = seaterType;
+      room.totalSeats = seaterType;
+      room.seatsLeft = seaterType - room.occupiedSeats;
+      room.status = room.seatsLeft > 0 ? "Available" : "Full";
+    }
+
+    if (monthlyFee !== undefined) {
+      room.price = monthlyFee;
+    }
+
+    const updatedRoom = await room.save();
+
+    console.log(`Room updated: ${updatedRoom.roomNumber} (${updatedRoom.seaterType} seater, ₹${updatedRoom.price}) by owner`);
+
+    res.json({ success: true, data: updatedRoom });
+  } catch (error) {
+    console.error('Error updating room:', error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+});
+
 // API: long polling for occupancy summary
 router.get("/api/rooms", requireWardenOrOwner, async (req, res) => {
   try {

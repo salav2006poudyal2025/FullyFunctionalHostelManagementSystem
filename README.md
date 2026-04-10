@@ -65,8 +65,10 @@ A Node.js/Express backend API for hostel booking management system.
 ### Rooms
 - `GET /booking/api/rooms` - Get occupancy data
 - `POST /booking/api/rooms` - Create new room (owner)
+- `GET /booking/api/rooms/:id` - Get single room details (owner)
+- `PUT /booking/api/rooms/:id` - Update room details (owner)
 - `GET /booking/api/rooms/:roomNumber/students` - Get students in room
 
 ## Data Storage
 
-Currently uses in-memory storage (arrays in `data/rooms.js`). In production, replace with a database like MongoDB or PostgreSQL.
+Uses MongoDB with Mongoose ODM for persistent data storage. Database: `hostel-booking`, Collections: `rooms`, `bookings`.
