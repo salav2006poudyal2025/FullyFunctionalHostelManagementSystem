@@ -2,6 +2,7 @@
   "name": "hostel-booking-system",
   "version": "1.0.0",
   "description": "A beginner-friendly hostel booking system built with Node.js and Express",
+  "type": "module",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

@@ -1,7 +1,7 @@
 // data/rooms.js
 // MongoDB models for rooms and bookings
 
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 // Room Schema
 const roomSchema = new mongoose.Schema({
@@ -106,4 +106,4 @@ const Room = mongoose.model('Room', roomSchema);
 const Booking = mongoose.model('Booking', bookingSchema);
 
 // Export models
-module.exports = { Room, Booking };
+export { Room, Booking };

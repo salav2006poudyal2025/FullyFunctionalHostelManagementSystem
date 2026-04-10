@@ -62,4 +62,4 @@ function validateBookingForm(data) {
   return errors; // {} means no errors = all valid
 }
 
-module.exports = { validateBookingForm };
+export { validateBookingForm };

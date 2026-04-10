@@ -1,8 +1,8 @@
 // routes/booking.js
-const express = require("express");
-const path = require("path");
-const { Room, Booking } = require("../data/rooms");
-const { validateBookingForm } = require("./validation");
+import express from "express";
+import path from "path";
+import { Room, Booking } from "../data/rooms.js";
+import { validateBookingForm } from "./validation.js";
 
 const router = express.Router();
 
@@ -513,7 +513,7 @@ router.put("/api/bookings/:id", requireOwner, async (req, res) => {
 });
 
 // API: delete student record
-router.delete("/api/bookings/:id", requireOwner, (req, res) => {
+router.delete("/api/bookings/:id", requireOwner, async (req, res) => {
   try {
     const id = req.params.id;
     const deletedBooking = await Booking.findByIdAndDelete(id);
@@ -529,4 +529,4 @@ router.delete("/api/bookings/:id", requireOwner, (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

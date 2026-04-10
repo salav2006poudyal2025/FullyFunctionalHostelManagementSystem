@@ -6,12 +6,12 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 // Step 1: Import the packages we need
-const express = require("express");     // Express helps us build a web server easily
-const session = require("express-session");
-const mongoose = require("mongoose");
+import express from "express";     // Express helps us build a web server easily
+import session from "express-session";
+import mongoose from "mongoose";
 
 // Step 2: Import our booking routes (the URL handlers)
-const bookingRoutes = require("./routes/booking");
+import bookingRoutes from "./routes/booking.js";
 
 // Step 3: Create the Express app
 const app  = express();
@@ -24,6 +24,12 @@ const users = {
 };
 
 // Serve static files from project root (for JS/CSS/dashboard HTML)
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 app.use(express.static(__dirname));
 
 // Session middleware
