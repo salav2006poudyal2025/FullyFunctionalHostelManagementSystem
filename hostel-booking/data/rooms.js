@@ -1,91 +1,109 @@
 // data/rooms.js
-// This file acts as our simple "database" for rooms.
-// In a real project, you would use a real database like MongoDB or MySQL.
+// MongoDB models for rooms and bookings
 
-const rooms = [
-  { id: 1, roomNumber: "101", seaterType: "2 seater", totalSeats: 2, price: 20000 },
-  { id: 2, roomNumber: "102", seaterType: "3 seater", totalSeats: 3, price: 15000 },
-  { id: 3, roomNumber: "103", seaterType: "4 seater", totalSeats: 4, price: 10000 },
-  { id: 4, roomNumber: "105", seaterType: "2 seater", totalSeats: 2, price: 18000 },
-  { id: 5, roomNumber: "106", seaterType: "3 seater", totalSeats: 3, price: 15000 },
-  { id: 6, roomNumber: "108", seaterType: "4 seater", totalSeats: 4, price: 22000 },
-  { id: 7, roomNumber: "112", seaterType: "2 seater", totalSeats: 2, price: 16000 },
-];
+const mongoose = require('mongoose');
 
-// This array will hold all submitted bookings (stored in memory while server runs)
-const bookings = [
-  {
-    id: 1,
-    fullName: "Ram Sharma",
-    email: "ram@example.com",
-    phone: "9800000000",
-    roomNumber: "101",
-    checkIn: "2026-04-15",
-    status: "Pending",
-    createdAt: "2026-04-01T10:00:00.000Z",
+// Room Schema
+const roomSchema = new mongoose.Schema({
+  roomNumber: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true
   },
-  {
-    id: 2,
-    fullName: "Sita Devi",
-    email: "sita@example.com",
-    phone: "9800000001",
-    roomNumber: "102",
-    checkIn: "2026-04-16",
-    status: "Pending",
-    createdAt: "2026-04-01T11:00:00.000Z",
+  seaterType: {
+    type: Number,
+    required: true,
+    enum: [2, 3, 4]
   },
-  {
-    id: 3,
-    fullName: "Hari Prasad",
-    email: "hari@example.com",
-    phone: "9800000002",
-    roomNumber: "101",
-    checkIn: "2026-04-17",
-    status: "Approved",
-    paymentStatus: "Pending",
-    createdAt: "2026-04-01T09:00:00.000Z",
-    actionedBy: "warden",
-    actionedAt: "2026-04-01T12:00:00.000Z",
+  totalSeats: {
+    type: Number,
+    required: true,
+    min: 2,
+    max: 4
   },
-  {
-    id: 4,
-    fullName: "Sulav Poudyal",
-    email: "sulav@example.com",
-    phone: "9800000003",
-    roomNumber: "102",
-    checkIn: "2026-04-18",
-    status: "Approved",
-    paymentStatus: "Complete",
-    createdAt: "2026-04-02T10:00:00.000Z",
-    actionedBy: "warden",
-    actionedAt: "2026-04-02T14:00:00.000Z",
+  price: {
+    type: Number,
+    required: true,
+    min: 0
   },
-  {
-    id: 5,
-    fullName: "Anita Thapa",
-    email: "anita@example.com",
-    phone: "9800000004",
-    roomNumber: "103",
-    checkIn: "2026-04-19",
-    status: "Approved",
-    paymentStatus: "Pending",
-    createdAt: "2026-04-03T09:00:00.000Z",
-    actionedBy: "warden",
-    actionedAt: "2026-04-03T11:00:00.000Z",
+  occupiedSeats: {
+    type: Number,
+    default: 0,
+    min: 0
   },
-  {
-    id: 6,
-    fullName: "Rajesh Kumar",
-    email: "rajesh@example.com",
-    phone: "9800000005",
-    roomNumber: "105",
-    checkIn: "2026-04-20",
-    status: "Approved",
-    paymentStatus: "Complete",
-    createdAt: "2026-04-04T08:00:00.000Z",
-    actionedBy: "warden",
-    actionedAt: "2026-04-04T10:00:00.000Z",
+  seatsLeft: {
+    type: Number,
+    default: function() {
+      return this.totalSeats;
+    },
+    min: 0
   },
-];
+  status: {
+    type: String,
+    default: 'Available',
+    enum: ['Available', 'Full']
+  }
+}, {
+  timestamps: true
+});
 
-module.exports = { rooms, bookings };
+// Booking Schema
+const bookingSchema = new mongoose.Schema({
+  fullName: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  email: {
+    type: String,
+    required: true,
+    trim: true,
+    lowercase: true
+  },
+  phone: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  roomNumber: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  checkIn: {
+    type: String,
+    required: true
+  },
+  status: {
+    type: String,
+    required: true,
+    enum: ['Pending', 'Approved', 'Rejected'],
+    default: 'Pending'
+  },
+  paymentStatus: {
+    type: String,
+    enum: ['Pending', 'Complete'],
+    default: 'Pending'
+  },
+  actionedBy: {
+    type: String,
+    enum: ['warden', 'owner']
+  },
+  actionedAt: {
+    type: Date
+  },
+  rejectionReason: {
+    type: String,
+    trim: true
+  }
+}, {
+  timestamps: true
+});
+
+// Create models
+const Room = mongoose.model('Room', roomSchema);
+const Booking = mongoose.model('Booking', bookingSchema);
+
+// Export models
+module.exports = { Room, Booking };

@@ -8,6 +8,7 @@
 // Step 1: Import the packages we need
 const express = require("express");     // Express helps us build a web server easily
 const session = require("express-session");
+const mongoose = require("mongoose");
 
 // Step 2: Import our booking routes (the URL handlers)
 const bookingRoutes = require("./routes/booking");
@@ -120,12 +121,25 @@ app.get("/", (req, res) => {
 });
 
 // ─── Start the server ─────────────────────────────────────────────────────────
-app.listen(PORT, () => {
-  console.log("─────────────────────────────────────────");
-  console.log(`  Hostel Booking System is running!`);
-  console.log(`  Student Booking: http://localhost:${PORT}/booking`);
-  console.log(`  Login: http://localhost:${PORT}/login`);
-  console.log(`  Warden: warden/warden123`);
-  console.log(`  Owner: owner/owner123`);
-  console.log("─────────────────────────────────────────");
-});
+// Connect to MongoDB and start server
+async function startServer() {
+  try {
+    await mongoose.connect('mongodb://localhost:27017/hostel-booking');
+    console.log('Connected to MongoDB');
+
+    app.listen(PORT, () => {
+      console.log("─────────────────────────────────────────");
+      console.log(`  Hostel Booking System is running!`);
+      console.log(`  Student Booking: http://localhost:${PORT}/booking`);
+      console.log(`  Login: http://localhost:${PORT}/login`);
+      console.log(`  Warden: warden/warden123`);
+      console.log(`  Owner: owner/owner123`);
+      console.log("─────────────────────────────────────────");
+    });
+  } catch (err) {
+    console.error('MongoDB connection error:', err);
+    process.exit(1);
+  }
+}
+
+startServer();
