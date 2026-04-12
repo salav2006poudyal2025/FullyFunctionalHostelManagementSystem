@@ -1,43 +1,11 @@
+import { useEffect, useState } from "react";
+import { getRooms } from "../../services/api";
 import twoseater from "../img/2-seater.jpeg";
 import threeseater from "../img/3-seater.jpeg";
 import fourseater from "../img/4-seater.jpeg";
 import hostel from "../img/hostel.jpeg";
 
-const rooms = [
-  {
-    img: twoseater,
-    roomNumber: "101",
-    seats: "2-Seater",
-    totalSeats: 2,
-    occupied: 1,
-    status: "Available",
-    desc: "Ideal for two friends seeking a quiet, homely space.",
-    features: ["Study Desk", "Attached Bath", "Wi-Fi"],
-    price: "₹4,500",
-  },
-  {
-    img: threeseater,
-    roomNumber: "102",
-    seats: "3-Seater",
-    totalSeats: 3,
-    occupied: 3,
-    status: "Full",
-    desc: "Comfortable and budget-friendly for students.",
-    features: ["Wardrobe", "24/7 Security", "Mess Access"],
-    price: "₹3,200",
-  },
-  {
-    img: fourseater,
-    roomNumber: "103",
-    seats: "4-Seater",
-    totalSeats: 4,
-    occupied: 2,
-    status: "Available",
-    desc: "Spacious and great for group living.",
-    features: ["Common Lounge", "Laundry", "CCTV"],
-    price: "₹2,600",
-  },
-];
+const seaterImgs = { 2: twoseater, 3: threeseater, 4: fourseater };
 
 const amenities = [
   { icon: "🔒", label: "24/7 Security" },
@@ -51,6 +19,13 @@ const amenities = [
 ];
 
 const LandingPage = () => {
+  const [rooms, setRooms] = useState([]);
+
+  useEffect(() => {
+    getRooms()
+      .then(setRooms)
+      .catch(() => {});
+  }, []);
   return (
     <>
       {/* NAVBAR */}
@@ -100,29 +75,42 @@ const LandingPage = () => {
         </p>
 
         <div className="sg-room-grid">
-          {rooms.map((room) => (
-            <div className="sg-room-card" key={room.title}>
-              <div className="sg-room-img-wrap">
-                <img src={room.img} alt={room.title} />
-              </div>
-              <div className="sg-room-body">
-                <h3 className="sg-room-title">{room.seats}</h3>
-                <p className="sg-room-desc">{room.desc}</p>
-                <div className="sg-room-features">
-                  {room.features.map((f) => (
-                    <span className="sg-feature-pill" key={f}>
-                      {f}
-                    </span>
-                  ))}
+          {rooms.length === 0 ? (
+            <p style={{ color: "var(--muted)", textAlign: "center" }}>
+              Loading rooms…
+            </p>
+          ) : (
+            rooms.map((room) => (
+              <div className="sg-room-card" key={room._id}>
+                <div className="sg-room-img-wrap">
+                  <img
+                    src={seaterImgs[room.seaterType] || twoseater}
+                    alt={`${room.seaterType}-Seater`}
+                  />
+                  <span
+                    className={`sg-room-status-dot ${room.status === "Available" ? "green" : "red"}`}
+                  />
                 </div>
-                <div className="sg-room-footer">
-                  <div className="sg-room-price">
-                    <strong>{room.price}</strong> /month
+                <div className="sg-room-body">
+                  <h3 className="sg-room-title">
+                    {room.seaterType}-Seater Room
+                  </h3>
+
+                  <div className="sg-room-footer">
+                    <div className="sg-room-price">
+                      <strong>Rs.{room.monthlyFee.toLocaleString()}</strong>{" "}
+                      /month
+                    </div>
+                    <span
+                      className={`sg-status-badge ${room.status === "Available" ? "green" : "red"}`}
+                    >
+                      {room.status}
+                    </span>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </section>
 

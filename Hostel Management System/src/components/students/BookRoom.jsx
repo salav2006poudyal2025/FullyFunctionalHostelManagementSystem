@@ -1,47 +1,12 @@
+import { useEffect, useState } from "react";
+import { getRooms, createBooking } from "../../services/api";
 import twoseater from "../img/2-seater.jpeg";
 import threeseater from "../img/3-seater.jpeg";
 import fourseater from "../img/4-seater.jpeg";
 
-const rooms = [
-  {
-    img: twoseater,
-    badge: "Popular",
-    title: "Two seater",
-    roomNumber: "101",
-    seats: "2-Seater",
-    totalSeats: 2,
-    occupied: 1,
-    status: "Available",
-    features: ["Study Desk", "Wardrobe", "Wi-Fi"],
-    price: "12,000",
-  },
-  {
-    img: threeseater,
-    badge: "Best Value",
-    title: "Three seater",
-    roomNumber: "102",
-    seats: "3-Seater",
-    totalSeats: 3,
-    occupied: 3,
-    status: "Full",
-    features: ["Wardrobe", "24/7 Security", "Mess Access"],
-    price: "11,500",
-  },
-  {
-    img: fourseater,
-    badge: "Budget Pick",
-    title: "Four Seater",
-    roomNumber: "103",
-    seats: "4-Seater",
-    totalSeats: 4,
-    occupied: 2,
-    status: "Available",
-    features: ["Common Lounge", "Laundry", "CCTV"],
-    price: "11,000",
-  },
-];
+const seaterImgs = { 2: twoseater, 3: threeseater, 4: fourseater };
 
-const EDU_OPTIONS = [
+const EducationOptions = [
   "Under Graduate (UG)",
   "Post Graduate (PG)",
   "Diploma",
@@ -51,7 +16,79 @@ const EDU_OPTIONS = [
 ];
 
 const BookRoomPage = () => {
-  const selectedRoom = rooms[0];
+  const [rooms, setRooms] = useState([]);
+  const [selectedRoom, setSelectedRoom] = useState(null);
+  const [form, setForm] = useState({
+    fullName: "",
+    phone: "",
+    email: "",
+    dob: "",
+    educationStatus: "",
+    permanentAddress: "",
+    temporaryAddress: "",
+  });
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    getRooms()
+      .then((data) => {
+        setRooms(data);
+        const avail = data.find((r) => r.status === "Available");
+        if (avail) setSelectedRoom(avail);
+      })
+      .catch(() => {});
+  }, []);
+
+  function update(e) {
+    setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    if (!selectedRoom) return setError("Please select a room.");
+    setError("");
+    setLoading(true);
+    try {
+      await createBooking({ ...form, room: selectedRoom._id });
+      setSuccess(true);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (success) {
+    return (
+      <div className="br-root">
+        <nav className="br-nav">
+          <a href="/" className="br-logo">
+            Shikha <span>Girls</span> Hostel
+          </a>
+        </nav>
+        <div className="br-success">
+          <h2>Booking Submitted!</h2>
+          <p>
+            Your request has been received. The warden will review it within 24
+            hours.
+          </p>
+          <a
+            href="/"
+            className="br-submit-btn"
+            style={{
+              display: "inline-block",
+              marginTop: 20,
+              textDecoration: "none",
+            }}
+          >
+            Back to Home
+          </a>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="br-root">
@@ -59,6 +96,7 @@ const BookRoomPage = () => {
         <a href="/" className="br-logo">
           Shikha <span>Girls</span> Hostel
         </a>
+
         <div className="br-nav-actions">
           <a href="/" className="br-nav-link">
             Back to Home
@@ -78,14 +116,26 @@ const BookRoomPage = () => {
           </div>
 
           <div className="br-room-list">
-            {rooms.map((room, i) => (
+            {rooms.length === 0 && (
+              <p style={{ color: "var(--muted)", padding: 12 }}>
+                Loading rooms…
+              </p>
+            )}
+            {rooms.map((room) => (
               <div
-                key={room.roomNumber}
-                className={`br-room-card ${i === 0 ? "selected" : ""} ${room.status === "Full" ? "full" : ""}`}
+                key={room._id}
+                onClick={() => room.status !== "Full" && setSelectedRoom(room)}
+                className={`br-room-card ${selectedRoom?._id === room._id ? "selected" : ""} ${room.status === "Full" ? "full" : ""}`}
+                style={{
+                  cursor: room.status === "Full" ? "not-allowed" : "pointer",
+                }}
               >
                 {/* Image */}
                 <div className="br-room-img-wrap">
-                  <img src={room.img} alt={room.title} />
+                  <img
+                    src={seaterImgs[room.seaterType] || twoseater}
+                    alt={`Room ${room.roomNumber}`}
+                  />{" "}
                   <span
                     className={`br-status-dot ${room.status === "Available" ? "green" : "red"}`}
                   />
@@ -98,7 +148,7 @@ const BookRoomPage = () => {
                       <span className="br-room-num">
                         Room #{room.roomNumber}
                       </span>
-                      <h4 className="br-room-name">{room.title}</h4>
+                      <h4 className="br-room-name">{room.seaterType}-Seater</h4>
                     </div>
                     <span
                       className={`br-status-badge ${room.status === "Available" ? "green" : "red"}`}
@@ -108,11 +158,9 @@ const BookRoomPage = () => {
                   </div>
 
                   <div className="br-room-meta">
-                    <span className="br-meta-pill">{room.seats}</span>
-                    <span className="br-meta-pill">
-                      🛏 {room.occupied}/{room.totalSeats}
+                    <span className="br-meta-pill price">
+                      Rs.{room.monthlyFee.toLocaleString()}/mo
                     </span>
-                    <span className="br-meta-pill price">{room.price}/mo</span>
                   </div>
 
                   {/* Occupancy bar */}
@@ -120,22 +168,13 @@ const BookRoomPage = () => {
                     <div
                       className="br-occ-fill"
                       style={{
-                        width: `${(room.occupied / room.totalSeats) * 100}%`,
+                        width: `${(room.occupiedSeats / room.totalSeats) * 100}%`,
                       }}
                     />
                   </div>
-
-                  <div className="br-room-features">
-                    {room.features.map((f) => (
-                      <span className="br-feat" key={f}>
-                        {f}
-                      </span>
-                    ))}
-                  </div>
                 </div>
 
-                {/* Selected indicator */}
-                {i === 0 && (
+                {selectedRoom?._id === room._id && (
                   <div className="br-selected-indicator">✓ Selected</div>
                 )}
               </div>
@@ -143,7 +182,7 @@ const BookRoomPage = () => {
           </div>
         </aside>
 
-        {/* ── RIGHT: Booking Form ── */}
+        {/* RIGHT: Booking Form */}
         <main className="br-main">
           <div className="br-form-header">
             <p className="br-form-eyebrow">Step 2</p>
@@ -153,30 +192,41 @@ const BookRoomPage = () => {
             </p>
           </div>
 
-          {/* Selected room summary */}
-          <div className="br-selected-summary">
-            <div className="br-summary-left">
-              <img
-                src={selectedRoom.img}
-                alt={selectedRoom.title}
-                className="br-summary-img"
-              />
-              <div>
-                <p className="br-summary-room">
-                  Room #{selectedRoom.roomNumber} · {selectedRoom.seats}
+          {selectedRoom && (
+            <div className="br-selected-summary">
+              <div className="br-summary-left">
+                <img
+                  src={seaterImgs[selectedRoom.seaterType] || twoseater}
+                  alt=""
+                  className="br-summary-img"
+                />
+                <div>
+                  <p className="br-summary-room">
+                    Room #{selectedRoom.roomNumber} · {selectedRoom.seaterType}
+                    -Seater
+                  </p>
+                  <p className="br-summary-name">
+                    {selectedRoom.seaterType}-Seater Room
+                  </p>
+                </div>
+              </div>
+              <div className="br-summary-right">
+                <p className="br-summary-price">
+                  Rs.{selectedRoom.monthlyFee.toLocaleString()}
                 </p>
-                <p className="br-summary-name">{selectedRoom.title}</p>
+                <p className="br-summary-freq">per month</p>
               </div>
             </div>
-            <div className="br-summary-right">
-              <p className="br-summary-price">{selectedRoom.price}</p>
-              <p className="br-summary-freq">per month</p>
+          )}
+
+          {error && (
+            <div className="lp-error" style={{ marginBottom: 16 }}>
+              {error}
             </div>
-          </div>
+          )}
 
           {/* Form */}
-          <form className="br-form">
-            {/* Row 1 */}
+          <form className="br-form" onSubmit={handleSubmit}>
             <div className="br-form-row">
               <div className="br-field br-col-2">
                 <label className="br-label">
@@ -185,12 +235,13 @@ const BookRoomPage = () => {
                 <input
                   className="br-input"
                   type="text"
-                  placeholder="e.g. shikha kandel"
+                  value={form.fullName}
+                  onChange={update}
+                  required
                 />
               </div>
             </div>
 
-            {/* Row 2 */}
             <div className="br-form-row">
               <div className="br-field">
                 <label className="br-label">
@@ -201,8 +252,10 @@ const BookRoomPage = () => {
                   <input
                     className="br-input br-input-prefixed"
                     type="tel"
-                    placeholder="10-digit number"
                     maxLength={10}
+                    value={form.phone}
+                    onChange={update}
+                    required
                   />
                 </div>
               </div>
@@ -214,27 +267,42 @@ const BookRoomPage = () => {
                 <input
                   className="br-input"
                   type="email"
-                  placeholder="you@example.com"
+                  name="email"
+                  value={form.email}
+                  onChange={update}
+                  required
                 />
               </div>
             </div>
 
-            {/* Row 3 */}
             <div className="br-form-row">
               <div className="br-field">
                 <label className="br-label">
                   Date of Birth <span className="br-req">*</span>
                 </label>
-                <input className="br-input" type="date" />
+                <input
+                  className="br-input"
+                  type="date"
+                  name="dob"
+                  value={form.dob}
+                  onChange={update}
+                  required
+                />
               </div>
 
               <div className="br-field">
                 <label className="br-label">
                   Current Education Status <span className="br-req">*</span>
                 </label>
-                <select className="br-input br-select">
+                <select
+                  className="br-input br-select"
+                  name="educationStatus"
+                  value={form.educationStatus}
+                  onChange={update}
+                  required
+                >
                   <option value="">— Select —</option>
-                  {EDU_OPTIONS.map((o) => (
+                  {EducationOptions.map((o) => (
                     <option key={o} value={o}>
                       {o}
                     </option>
@@ -243,7 +311,6 @@ const BookRoomPage = () => {
               </div>
             </div>
 
-            {/* Row 4 */}
             <div className="br-form-row">
               <div className="br-field br-col-2">
                 <label className="br-label">
@@ -252,12 +319,14 @@ const BookRoomPage = () => {
                 <textarea
                   className="br-textarea"
                   rows={2}
-                  placeholder="Village / Town, District, State, PIN"
+                  placeholder="Village / Town, District"
+                  value={form.permanentAddress}
+                  onChange={update}
+                  required
                 />
               </div>
             </div>
 
-            {/* Row 5 */}
             <div className="br-form-row">
               <div className="br-field br-col-2">
                 <label className="br-label">
@@ -266,31 +335,39 @@ const BookRoomPage = () => {
                 <textarea
                   className="br-textarea"
                   rows={2}
-                  placeholder="Current local address near hostel"
+                  name="temporaryAddress"
+                  placeholder="Current local address"
+                  value={form.temporaryAddress}
+                  onChange={update}
+                  required
                 />
               </div>
             </div>
 
-            {/* Row 6 — Room number (auto-filled, read-only) */}
-            <div className="br-form-row">
-              <div className="br-field br-col-2">
-                <label className="br-label">Room Number</label>
-                <input
-                  className="br-input br-input-readonly"
-                  type="text"
-                  value={`Room ${selectedRoom.roomNumber} — ${selectedRoom.title} (${selectedRoom.seats})`}
-                  readOnly
-                />
+            {selectedRoom && (
+              <div className="br-form-row">
+                <div className="br-field br-col-2">
+                  <label className="br-label">Room Number</label>
+                  <input
+                    className="br-input br-input-readonly"
+                    type="text"
+                    value={`Room ${selectedRoom.roomNumber} — ${selectedRoom.seaterType}-Seater`}
+                    readOnly
+                  />
+                </div>
               </div>
-            </div>
+            )}
 
-            {/* Submit */}
             <div className="br-form-footer">
               <p className="br-form-note">
                 Your booking will be reviewed by the warden within 24 hours
               </p>
-              <button type="submit" className="br-submit-btn">
-                Confirm Booking
+              <button
+                type="submit"
+                className="br-submit-btn"
+                disabled={loading}
+              >
+                {loading ? "Submitting…" : "Confirm Booking"}
               </button>
             </div>
           </form>
