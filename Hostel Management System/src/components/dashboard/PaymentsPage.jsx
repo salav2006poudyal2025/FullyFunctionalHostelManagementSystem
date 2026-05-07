@@ -90,7 +90,9 @@ const PaymentsPage = () => {
         </div>
         <div className="dash-stat-card rose">
           <div className="dash-stat-icon">💰</div>
-          <div className="dash-stat-value">₹{totalAmount.toLocaleString()}</div>
+          <div className="dash-stat-value">
+            Rs.{totalAmount.toLocaleString()}
+          </div>
           <div className="dash-stat-label">Collected</div>
         </div>
       </div>

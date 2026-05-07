@@ -242,6 +242,247 @@ body {
   }
 }
 
+/* ------------------------------------------------------------------------------------- */
+/* ── Root layout ── */
+.ul-root {
+  display: flex;
+  min-height: 100vh;
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* ── Left decorative panel ── */
+.ul-panel {
+  display: none;
+  position: relative;
+  width: 42%;
+  background: linear-gradient(160deg,
+      var(--rose) 0%,
+      var(--rose-dk) 45%,
+      var(--ink) 100%);
+  overflow: hidden;
+}
+
+@media (min-width: 900px) {
+  .ul-panel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.ul-panel-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(28, 25, 23, 0.25);
+}
+
+.ul-panel-content {
+  position: relative;
+  z-index: 1;
+  padding: 2.5rem;
+  color: #fff;
+  text-align: center;
+}
+
+.ul-panel-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.ul-panel-logo span {
+  color: #f0c4b8;
+}
+
+.ul-panel-tagline {
+  font-size: 1rem;
+  opacity: 0.82;
+  font-style: italic;
+  line-height: 1.7;
+}
+
+/* ── Right form side ── */
+.ul-form-side {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1.5rem;
+  background: var(--cream);
+}
+
+.ul-form-card {
+  width: 100%;
+  max-width: 420px;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  padding: 2.5rem 2rem;
+}
+
+.ul-back-link {
+  display: inline-block;
+  margin-bottom: 1.4rem;
+  font-size: 0.85rem;
+  color: var(--rose);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.ul-back-link:hover {
+  color: var(--rose-dk);
+}
+
+/* ── Toggle ── */
+.ul-toggle-wrap {
+  display: flex;
+  background: var(--cream);
+  border: 1px solid var(--sand);
+  border-radius: 999px;
+  padding: 4px;
+  gap: 4px;
+  margin-bottom: 1.6rem;
+}
+
+.ul-toggle-btn {
+  flex: 1;
+  padding: 0.6rem 0;
+  border: none;
+  background: transparent;
+  border-radius: 999px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.ul-toggle-btn.active {
+  background: var(--rose);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(201, 137, 122, 0.25);
+}
+
+/* ── Header ── */
+.ul-form-header {
+  margin-bottom: 1.5rem;
+}
+
+.ul-form-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 0.3rem;
+}
+
+.ul-form-sub {
+  font-size: 0.9rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+/* ── Error ── */
+.ul-error {
+  background: var(--red-bg);
+  color: var(--red);
+  border: 1px solid rgba(192, 57, 43, 0.18);
+  border-radius: 10px;
+  padding: 0.8rem 1rem;
+  font-size: 0.88rem;
+  margin-bottom: 1rem;
+}
+
+/* ── Form ── */
+.ul-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.ul-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.ul-label {
+  font-size: 0.84rem;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.ul-input {
+  padding: 0.78rem 1rem;
+  border: 1.5px solid var(--sand);
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--ink);
+  background: var(--cream);
+  outline: none;
+  transition: all 0.2s;
+}
+
+.ul-input:focus {
+  border-color: var(--rose);
+  box-shadow: 0 0 0 3px rgba(201, 137, 122, 0.15);
+  background: #fff;
+}
+
+/* ── Submit button ── */
+.ul-submit-btn {
+  margin-top: 0.4rem;
+  padding: 0.85rem;
+  background: var(--rose);
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  font-size: 0.96rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.ul-submit-btn:hover:not(:disabled) {
+  background: var(--rose-dk);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 22px rgba(201, 137, 122, 0.35);
+}
+
+.ul-submit-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* ── Footer ── */
+.ul-footer-note {
+  margin-top: 1.8rem;
+  font-size: 0.78rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .ul-panel {
+    display: none;
+  }
+
+  .ul-form-side {
+    padding: 2rem 1rem;
+  }
+
+  .ul-form-card {
+    padding: 2rem 1.4rem;
+  }
+}
+
+/* -------------------------------------------------------------------------------------- */
 /*  ROOMS SECTION */
 
 .sg-rooms {

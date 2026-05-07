@@ -118,7 +118,7 @@ const WardenPage = () => {
         </form>
       </div>
 
-      <div className="dash-info-box">
+      {/* <div className="dash-info-box">
         <h4>ℹ️ About Warden Access</h4>
         <ul>
           <li>
@@ -132,7 +132,7 @@ const WardenPage = () => {
             create other wardens.
           </li>
         </ul>
-      </div>
+      </div> */}
     </div>
   );
 };

@@ -103,7 +103,7 @@ const RoomsPage = () => {
               </select>
             </div>
             <div className="dash-form-field">
-              <label>Monthly Fee (₹)</label>
+              <label>Monthly Fee</label>
               <input
                 name="monthlyFee"
                 type="number"
@@ -148,7 +148,7 @@ const RoomsPage = () => {
               </div>
               <div className="dash-room-stat">
                 <span className="dash-room-stat-val">
-                  ₹{room.monthlyFee.toLocaleString()}
+                  Rs.{room.monthlyFee.toLocaleString()}
                 </span>
                 <span className="dash-room-stat-label">/month</span>
               </div>

@@ -55,8 +55,8 @@ const LandingPage = () => {
             from home.
           </h1>
           <p className="sg-hero-sub">
-            A warm, secure, and student-friendly hostel built for young women
-            who deserve more than just a bed.
+            A warm, secure and student-friendly hostel built for young women who
+            deserve more than just a bed.
           </p>
         </div>
         <div className="sg-scroll">
