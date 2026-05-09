@@ -37,8 +37,8 @@ const LandingPage = () => {
           <a href="/login" className="sg-btn sg-btn-ghost">
             Login
           </a>
-          <a href="/book-room" className="sg-btn sg-btn-solid">
-            Book Room
+          <a href="/signup" className="sg-btn sg-btn-solid">
+            Signup
           </a>
         </div>
       </nav>

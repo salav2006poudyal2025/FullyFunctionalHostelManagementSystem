@@ -5,6 +5,7 @@ import "./StudentDashboard.css";
 const navLinks = [
   { to: "/student-dashboard", label: "Overview", icon: "📊", end: true },
   { to: "/student-dashboard/profile", label: "My Profile", icon: "👩‍🎓" },
+  { to: "/student-dashboard/book-room", label: "Book Room", icon: "📝" }, // NEW
   { to: "/student-dashboard/room", label: "My Room", icon: "🏠" },
   { to: "/student-dashboard/payments", label: "My Payments", icon: "💳" },
 ];
