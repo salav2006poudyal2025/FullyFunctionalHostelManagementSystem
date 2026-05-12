@@ -14,17 +14,12 @@ function isEmpty(value) {
 function validateBookingForm(data) {
   const errors = {};
 
-  // 1. First Name — required
-  if (isEmpty(data.firstName)) {
-    errors.firstName = "The field is required.";
+  // 1. Full Name — required
+  if (isEmpty(data.fullName)) {
+    errors.fullName = "Full name is required.";
   }
 
-  // 2. Last Name — required
-  if (isEmpty(data.lastName)) {
-    errors.lastName = "The field is required.";
-  }
-
-  // 3. Email — required + valid format
+  // 2. Email — required + valid format
   if (isEmpty(data.email)) {
     errors.email = "The field is required.";
   } else {
@@ -35,7 +30,7 @@ function validateBookingForm(data) {
     }
   }
 
-  // 4. Phone — required, numeric, at least 10 digits
+  // 3. Phone — required, numeric, at least 10 digits
   if (isEmpty(data.phone)) {
     errors.phone = "The field is required.";
   } else {
@@ -49,12 +44,12 @@ function validateBookingForm(data) {
     }
   }
 
-  // 5. Room — required (the dropdown value must not be empty)
+  // 4. Room — required (the dropdown value must not be empty)
   if (isEmpty(data.roomNumber)) {
     errors.roomNumber = "The field is required.";
   }
 
-  // 6. Check-in date — required
+  // 5. Check-in date — required
   if (isEmpty(data.checkIn)) {
     errors.checkIn = "The field is required.";
   }
