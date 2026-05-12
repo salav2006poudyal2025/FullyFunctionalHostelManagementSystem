@@ -1,8 +1,14 @@
 // routes/booking.js
 import express from "express";
 import path from "path";
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 import { Room, Booking } from "../data/rooms.js";
 import { validateBookingForm } from "./validation.js";
+import aiRoomQueryRouter from "./aiRoomQuery.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const router = express.Router();
 
@@ -65,17 +71,17 @@ async function getOccupancyData() {
 
 // Serve booking form
 router.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "..", "index.html"));
+  res.sendFile(path.join(__dirname, "..", "rooms.html"));
 });
 
 // Warden dashboard
 router.get("/warden", requireWardenOrOwner, (req, res) => {
-  res.sendFile(path.join(__dirname, "..", "warden-dashboard.html"));
+  res.sendFile(path.join(__dirname, "..", "rooms.html"));
 });
 
 // Admin dashboard
 router.get("/admin", requireOwner, (req, res) => {
-  res.sendFile(path.join(__dirname, "..", "admin-dashboard.html"));
+  res.sendFile(path.join(__dirname, "..", "rooms.html"));
 });
 
 // Owner payments page
@@ -442,10 +448,46 @@ router.post("/api/bookings", async (req, res) => {
       return res.status(400).json({ success: false, message: "Selected room does not exist" });
     }
 
+    // Check for duplicate booking requests by email
+    const existingBookingByEmail = await Booking.findOne({
+      email: data.email.toLowerCase().trim(),
+      status: { $in: ['Pending', 'Approved'] }
+    });
+
+    if (existingBookingByEmail) {
+      return res.status(409).json({
+        success: false,
+        message: "You already have a booking request. A student can only have one active booking request at a time.",
+        existingBooking: {
+          roomNumber: existingBookingByEmail.roomNumber,
+          status: existingBookingByEmail.status,
+          submittedAt: existingBookingByEmail.createdAt
+        }
+      });
+    }
+
+    // Check for duplicate booking requests by phone number (additional safeguard)
+    const existingBookingByPhone = await Booking.findOne({
+      phone: data.phone.trim(),
+      status: { $in: ['Pending', 'Approved'] }
+    });
+
+    if (existingBookingByPhone) {
+      return res.status(409).json({
+        success: false,
+        message: "A booking request with this phone number already exists. Each phone number can only have one active booking request.",
+        existingBooking: {
+          roomNumber: existingBookingByPhone.roomNumber,
+          status: existingBookingByPhone.status,
+          submittedAt: existingBookingByPhone.createdAt
+        }
+      });
+    }
+
     const booking = new Booking({
       fullName: data.fullName,
-      email: data.email,
-      phone: data.phone,
+      email: data.email.toLowerCase().trim(),
+      phone: data.phone.trim(),
       roomNumber: data.roomNumber,
       checkIn: data.checkIn,
       status: "Pending",
@@ -453,9 +495,25 @@ router.post("/api/bookings", async (req, res) => {
 
     const savedBooking = await booking.save();
 
-    res.status(201).json({ success: true, data: savedBooking });
+    console.log(`New booking request: ${data.fullName} (${data.email}) for room ${data.roomNumber}`);
+
+    res.status(201).json({ 
+      success: true, 
+      data: savedBooking,
+      message: "Booking request submitted successfully. Please wait for approval."
+    });
   } catch (error) {
     console.error('Error creating booking:', error);
+    
+    // Handle MongoDB duplicate key errors
+    if (error.code === 11000) {
+      const field = Object.keys(error.keyPattern)[0];
+      return res.status(409).json({
+        success: false,
+        message: `A booking with this ${field} already exists. Please use a different ${field} or contact support.`
+      });
+    }
+    
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 });
@@ -581,5 +639,9 @@ router.delete("/api/bookings/:id", requireOwner, async (req, res) => {
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 });
+
+// ─── AI Routes ───────────────────────────────────────────────────────────────
+// POST /booking/api/ai/room-query — natural language room search via Claude Haiku
+router.use("/api/ai", aiRoomQueryRouter);
 
 export default router;
