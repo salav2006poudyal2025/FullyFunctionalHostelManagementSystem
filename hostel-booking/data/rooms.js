@@ -101,6 +101,11 @@ const bookingSchema = new mongoose.Schema({
   timestamps: true
 });
 
+// Add indexes for performance and duplicate prevention
+bookingSchema.index({ email: 1, status: 1 });
+bookingSchema.index({ phone: 1, status: 1 });
+bookingSchema.index({ roomNumber: 1, status: 1 });
+
 // Create models
 const Room = mongoose.model('Room', roomSchema);
 const Booking = mongoose.model('Booking', bookingSchema);
