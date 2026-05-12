@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Room Management - Hostel Owner</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/style.css">
 </head>
 <body>
     <div class="container">
@@ -57,13 +57,14 @@
     </div>
 
     <!-- Delete Confirmation Modal -->
-    <div id="deleteModal" class="modal" style="display: none;">
+    <div id="deleteModal" class="modal modal-hidden">
         <div class="modal-content">
+            <div class="modal-icon">⚠️</div>
             <h3>Confirm Delete</h3>
             <p id="deleteMessage"></p>
             <div class="modal-actions">
                 <button id="cancelDelete" class="btn-secondary">Cancel</button>
-                <button id="confirmDelete" class="btn-danger">Delete</button>
+                <button id="confirmDelete" class="btn-danger">🗑️ Delete</button>
             </div>
         </div>
     </div>
@@ -73,6 +74,73 @@
         <span id="toastMessage"></span>
     </div>
 
-    <script src="rooms.js"></script>
+    <!-- Floating Chat Widget -->
+    <div id="chatWidget" class="chat-widget">
+        <!-- Chat Bubble -->
+        <div id="chatBubble" class="chat-bubble">
+            <div class="chat-bubble-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+            </div>
+            <span class="chat-bubble-text">Chat with AI</span>
+        </div>
+
+        <!-- Chat Panel -->
+        <div id="chatPanel" class="chat-panel chat-panel-hidden">
+            <!-- Chat Header -->
+            <div class="chat-header">
+                <div class="chat-header-info">
+                    <h3>Hostel AI Assistant</h3>
+                    <span class="chat-status">Online</span>
+                </div>
+                <div class="chat-header-actions">
+                    <button id="minimizeChat" class="chat-btn chat-btn-minimize">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                    </button>
+                    <button id="closeChat" class="chat-btn chat-btn-close">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Chat Messages -->
+            <div id="chatMessages" class="chat-messages">
+                <div class="chat-message ai-message">
+                    <div class="message-content">
+                        Hello! I'm your hostel AI assistant. I can help you find rooms, check availability, and answer questions about hostel policies. How can I assist you today?
+                    </div>
+                </div>
+            </div>
+
+            <!-- Typing Indicator -->
+            <div id="typingIndicator" class="typing-indicator typing-indicator-hidden">
+                <div class="typing-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+
+            <!-- Chat Input -->
+            <div class="chat-input-container">
+                <textarea id="chatInput" class="chat-input" placeholder="Ask about rooms, payments, policies..." rows="1"></textarea>
+                <button id="sendMessage" class="chat-send-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/rooms.js"></script>
+    <script src="/chat-widget.js"></script>
 </body>
 </html>
