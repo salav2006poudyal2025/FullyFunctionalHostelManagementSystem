@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { getWardens, createWarden, deleteWarden } from "../../services/api";
+import { getWardens, createWarden, updateWarden, deleteWarden } from "../../services/api";
 
 const WardenPage = () => {
   const [wardens, setWardens] = useState([]);
   const [loadingList, setLoadingList] = useState(true);
   const [form, setForm] = useState({ fullName: "", email: "", phone: "", password: "" });
+  const [editingId, setEditingId] = useState(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -45,22 +46,42 @@ const WardenPage = () => {
       setSaving(false);
       return;
     }
-    if (form.password.length < 6) {
+    if (!editingId && form.password.length < 6) {
       setError("Password must be at least 6 characters.");
       setSaving(false);
       return;
     }
 
     try {
-      await createWarden(form);
-      setSuccess("Warden created successfully!");
+      if (editingId) {
+        // Exclude empty password on update if not changed
+        const updateData = { fullName: form.fullName, email: form.email, phone: form.phone };
+        if (form.password) updateData.password = form.password;
+        await updateWarden(editingId, updateData);
+        setSuccess("Warden updated successfully!");
+      } else {
+        await createWarden(form);
+        setSuccess("Warden created successfully!");
+      }
       setForm({ fullName: "", email: "", phone: "", password: "" });
+      setEditingId(null);
       loadWardens();
     } catch (err) {
       setError(err.message);
     } finally {
       setSaving(false);
     }
+  }
+
+  function handleEdit(w) {
+    setEditingId(w._id);
+    setForm({
+      fullName: w.fullName || "",
+      email: w.email || "",
+      phone: w.phone || "",
+      password: "", // don't populate password
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   async function handleDelete(id) {
@@ -82,11 +103,13 @@ const WardenPage = () => {
         </div>
       </div>
 
-      {/* Create warden form */}
+      {/* Create / Edit warden form */}
       <div className="dash-form-card" style={{ maxWidth: 540, marginBottom: 40 }}>
-        <h3 className="dash-form-title">Add New Warden</h3>
+        <h3 className="dash-form-title">{editingId ? "Edit Warden" : "Add New Warden"}</h3>
         <p style={{ color: "var(--muted)", fontSize: 13.5, marginBottom: 20 }}>
-          Wardens can view rooms, approve/reject bookings, and manage students.
+          {editingId 
+            ? "Update warden details. Leave password empty to keep current password." 
+            : "Wardens can view rooms, approve/reject bookings, and manage students."}
         </p>
 
         {error && <div className="lp-error" style={{ marginBottom: 16 }}>{error}</div>}
@@ -106,17 +129,34 @@ const WardenPage = () => {
             <input name="phone" type="tel" pattern="\d{10}" title="10 digits" className="dash-input" value={form.phone} onChange={update} />
           </div>
           <div className="dash-form-field">
-            <label>Password</label>
-            <input name="password" type="password" className="dash-input" value={form.password} onChange={update} required minLength={6} />
+            <label>{editingId ? "New Password (optional)" : "Password"}</label>
+            <input name="password" type="password" className="dash-input" value={form.password} onChange={update} required={!editingId} minLength={6} />
           </div>
-          <button
-            type="submit"
-            className="dash-btn green"
-            style={{ alignSelf: "flex-start", padding: "10px 28px" }}
-            disabled={saving}
-          >
-            {saving ? "Creating…" : "Create Warden"}
-          </button>
+          <div style={{ display: "flex", gap: "10px", alignSelf: "flex-start" }}>
+            <button
+              type="submit"
+              className="dash-btn green"
+              style={{ padding: "10px 28px" }}
+              disabled={saving}
+            >
+              {saving ? "Saving…" : editingId ? "Update Warden" : "Create Warden"}
+            </button>
+            {editingId && (
+              <button
+                type="button"
+                className="dash-btn"
+                style={{ padding: "10px 28px", background: "var(--muted)", color: "white" }}
+                onClick={() => {
+                  setEditingId(null);
+                  setForm({ fullName: "", email: "", phone: "", password: "" });
+                  setError("");
+                  setSuccess("");
+                }}
+              >
+                Cancel
+              </button>
+            )}
+          </div>
         </form>
       </div>
 
@@ -146,7 +186,10 @@ const WardenPage = () => {
                     <td>{w.email}</td>
                     <td>{w.phone || "—"}</td>
                     <td>{new Date(w.createdAt).toLocaleDateString()}</td>
-                    <td>
+                    <td style={{ display: "flex", gap: "8px" }}>
+                      <button className="dash-btn sand" onClick={() => handleEdit(w)}>
+                        ✎ Edit
+                      </button>
                       <button className="dash-btn red" onClick={() => handleDelete(w._id)}>
                         🗑 Delete
                       </button>

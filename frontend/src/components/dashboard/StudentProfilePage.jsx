@@ -1,17 +1,57 @@
 import { useEffect, useState } from "react";
-import { getStudentProfile } from "../../services/api";
+import { getStudentProfile, updateStudentProfile } from "../../services/api";
 
 const StudentProfilePage = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [form, setForm] = useState({});
 
-  useEffect(() => {
+  const loadData = () => {
+    setLoading(true);
     getStudentProfile()
-      .then(setData)
+      .then((res) => {
+        setData(res);
+        const s = res?.student || {};
+        const b = res?.booking || {};
+        setForm({
+          name: b.fullName || s.name || "",
+          email: b.email || s.email || "",
+          phone: b.phone || "",
+          dob: b.dob ? b.dob.split("T")[0] : "",
+          educationStatus: b.educationStatus || "",
+          permanentAddress: b.permanentAddress || "",
+          temporaryAddress: b.temporaryAddress || "",
+        });
+      })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    loadData();
   }, []);
+
+  const handleUpdate = (e) => {
+    setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
+  };
+
+  const handleSave = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    setError("");
+    try {
+      await updateStudentProfile(form);
+      setIsEditing(false);
+      loadData();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   if (loading) return <div className="dash-loading">Loading…</div>;
 
@@ -84,18 +124,62 @@ const StudentProfilePage = () => {
 
         <div className="sdash-profile-divider" />
 
-        <div className="sdash-profile-grid">
-          {fields.map((f) => (
-            <div key={f.label} className="sdash-profile-field">
-              <span className="sdash-profile-label">{f.label}</span>
-              <span className="sdash-profile-value">{f.value || "—"}</span>
+        {isEditing ? (
+          <form onSubmit={handleSave} style={{ marginTop: 24, display: "flex", flexDirection: "column", gap: 16 }}>
+            <div className="dash-form-field">
+              <label>Full Name</label>
+              <input name="name" className="dash-input" value={form.name} onChange={handleUpdate} required />
             </div>
-          ))}
-        </div>
-
-        <p className="sdash-profile-note">
-          To update your information, please contact the warden directly.
-        </p>
+            <div className="dash-form-field">
+              <label>Email</label>
+              <input name="email" type="email" className="dash-input" value={form.email} onChange={handleUpdate} required />
+            </div>
+            <div className="dash-form-field">
+              <label>Phone</label>
+              <input name="phone" type="tel" pattern="\d{10}" className="dash-input" value={form.phone} onChange={handleUpdate} />
+            </div>
+            <div className="dash-form-field">
+              <label>Date of Birth</label>
+              <input name="dob" type="date" className="dash-input" value={form.dob} onChange={handleUpdate} />
+            </div>
+            <div className="dash-form-field">
+              <label>Education Status</label>
+              <input name="educationStatus" className="dash-input" value={form.educationStatus} onChange={handleUpdate} />
+            </div>
+            <div className="dash-form-field">
+              <label>Permanent Address</label>
+              <input name="permanentAddress" className="dash-input" value={form.permanentAddress} onChange={handleUpdate} />
+            </div>
+            <div className="dash-form-field">
+              <label>Temporary Address</label>
+              <input name="temporaryAddress" className="dash-input" value={form.temporaryAddress} onChange={handleUpdate} />
+            </div>
+            <div style={{ display: "flex", gap: 12 }}>
+              <button type="submit" className="dash-btn green" disabled={saving}>
+                {saving ? "Saving..." : "Save Changes"}
+              </button>
+              <button type="button" className="dash-btn" onClick={() => setIsEditing(false)} disabled={saving}>
+                Cancel
+              </button>
+            </div>
+          </form>
+        ) : (
+          <>
+            <div className="sdash-profile-grid">
+              {fields.map((f) => (
+                <div key={f.label} className="sdash-profile-field">
+                  <span className="sdash-profile-label">{f.label}</span>
+                  <span className="sdash-profile-value">{f.value || "—"}</span>
+                </div>
+              ))}
+            </div>
+            <div className="dash-actions" style={{ marginTop: 24 }}>
+              <button className="dash-btn sand" onClick={() => setIsEditing(true)}>
+                ✎ Edit Profile
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

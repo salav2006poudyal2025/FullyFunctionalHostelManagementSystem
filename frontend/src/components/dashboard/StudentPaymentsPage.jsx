@@ -129,7 +129,7 @@ const StudentPaymentsPage = () => {
         throw new Error("Khalti did not return a payment URL.");
       }
       setPaymentSession(payment);
-      setPaymentSuccess("Dummy Khalti QR is ready. Scan it and then verify the payment.");
+      setPaymentSuccess("Khalti QR is ready. Scan it and then verify the payment.");
     } catch (err) {
       setPaymentError(err.message || "Could not start Khalti payment.");
     } finally {
@@ -183,19 +183,19 @@ const StudentPaymentsPage = () => {
           <div>
             <h2>Token payment with Khalti QR</h2>
             <p>
-              Generate the dummy Khalti QR, scan it, and verify the Rs.500
+              Generate the Khalti QR, scan it, and verify the Rs.500
               token payment before the 15 minute timer ends.
             </p>
           </div>
           <div className="sdash-payment-summary">
             <strong>
               {booking
-                ? tokenPayment?.status === "Confirmed"
-                  ? "Token paid, waiting approval"
-                  : booking.status === "Pending"
-                    ? `Rs.${amountToPay.toLocaleString()} due ${countdown ? `in ${countdown}` : ""}`
-                    : booking.status === "Approved"
-                      ? "Booking confirmed"
+                ? booking.status === "Approved"
+                  ? "Booking confirmed"
+                  : tokenPayment?.status === "Confirmed"
+                    ? "Token paid, waiting approval"
+                    : booking.status === "Pending"
+                      ? `Rs.${amountToPay.toLocaleString()} due ${countdown ? `in ${countdown}` : ""}`
                       : "Booking expired"
                 : "No active booking"}
             </strong>
@@ -223,16 +223,16 @@ const StudentPaymentsPage = () => {
               payLoading
             }
           >
-            {payLoading ? "Processing..." : "Generate Dummy QR"}
+            {payLoading ? "Processing..." : "Generate QR"}
           </button>
           {paymentSession?.payment_url && (
             <div className="sdash-qr-card" style={{ marginTop: 16 }}>
               <img
                 src={`https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=${encodeURIComponent(paymentSession.payment_url)}`}
-                alt="Dummy Khalti QR code for Rs.500 token payment"
+                alt="Khalti QR code for Rs.500 token payment"
               />
               <p className="sdash-qr-guide">
-                Scan this dummy QR for Rs.{amountToPay}. After scanning, click
+                Scan this QR for Rs.{amountToPay}. After scanning, click
                 verify to submit the token payment.
               </p>
               <div className="dash-actions" style={{ justifyContent: "center" }}>
@@ -297,13 +297,12 @@ const StudentPaymentsPage = () => {
             <div className="sdash-booking-row">
               <span className="sdash-booking-label">Verification Status</span>
               <span
-                className={`dash-badge ${
-                  tokenPayment.status === "Confirmed"
-                    ? "approved"
-                    : tokenPayment.status === "Expired"
-                      ? "rejected"
-                      : "pending"
-                }`}
+                className={`dash-badge ${tokenPayment.status === "Confirmed"
+                  ? "approved"
+                  : tokenPayment.status === "Expired"
+                    ? "rejected"
+                    : "pending"
+                  }`}
               >
                 {tokenPayment.status || "Pending"}
               </span>
@@ -313,10 +312,10 @@ const StudentPaymentsPage = () => {
               <span className="sdash-booking-value">
                 {tokenPayment.paidAt
                   ? new Date(tokenPayment.paidAt).toLocaleDateString("en-NP", {
-                      day: "numeric",
-                      month: "long",
-                      year: "numeric",
-                    })
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  })
                   : "-"}
               </span>
             </div>

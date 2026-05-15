@@ -397,3 +397,34 @@ exports.tokenPayment = async (req, res) => {
     res.status(err.statusCode || 500).json({ message: err.message });
   }
 };
+
+// PUT /api/student/me - update student and booking profile
+exports.updateMe = async (req, res) => {
+  try {
+    const { name, email, phone, dob, permanentAddress, temporaryAddress, educationStatus } = req.body;
+    const student = req.student;
+
+    if (name) student.name = name;
+    if (email) student.email = email;
+    await student.save();
+
+    const booking = await Booking.findOne({
+      $or: [{ student: student._id }, { email: student.email }],
+    }).sort({ createdAt: -1 });
+
+    if (booking) {
+      if (name) booking.fullName = name;
+      if (email) booking.email = email;
+      if (phone !== undefined) booking.phone = phone;
+      if (dob !== undefined) booking.dob = dob;
+      if (permanentAddress !== undefined) booking.permanentAddress = permanentAddress;
+      if (temporaryAddress !== undefined) booking.temporaryAddress = temporaryAddress;
+      if (educationStatus !== undefined) booking.educationStatus = educationStatus;
+      await booking.save();
+    }
+
+    res.json({ message: "Profile updated successfully", student });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};

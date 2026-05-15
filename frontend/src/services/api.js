@@ -77,6 +77,9 @@ export const studentLogin = (name, password) =>
 export const getStudentProfile = () =>
   studentReq("GET", "/student/me");
 
+export const updateStudentProfile = (data) =>
+  studentReq("PUT", "/student/me", data);
+
 export const getRooms = () => req("GET", "/rooms");
 export const queryRoomsByAI = (queryText) =>
   req("POST", "/rooms/query", { query: queryText });
