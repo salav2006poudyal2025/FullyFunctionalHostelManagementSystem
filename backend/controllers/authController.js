@@ -1,6 +1,12 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const {
+  cleanEmail,
+  firstValidationError,
+  validateEmail,
+  validatePassword,
+} = require("../utils/validation");
 
 async function ensureDefaultOwner(email, password) {
   if (email !== "owner@gmail.com" || password !== "owner12345") return;
@@ -30,11 +36,15 @@ async function ensureDefaultOwner(email, password) {
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const emailClean = email?.trim().toLowerCase();
-    const passwordClean = password?.trim();
+    const emailClean = cleanEmail(email);
+    const passwordClean = String(password || "");
+    const validationError = firstValidationError([
+      validateEmail(emailClean),
+      validatePassword(passwordClean),
+    ]);
 
-    if (!emailClean || !passwordClean) {
-      return res.status(400).json({ message: "Email and password are required" });
+    if (validationError) {
+      return res.status(400).json({ message: validationError });
     }
 
     await ensureDefaultOwner(emailClean, passwordClean);

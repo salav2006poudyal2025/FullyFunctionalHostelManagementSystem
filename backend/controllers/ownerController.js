@@ -1,35 +1,40 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
+const {
+  cleanEmail,
+  cleanText,
+  firstValidationError,
+  validateEmail,
+  validateName,
+  validatePassword,
+  validatePhone,
+} = require("../utils/validation");
 
 // POST /api/owner/wardens
 exports.createWarden = async (req, res) => {
   try {
     const { fullName, email, phone, password } = req.body;
+    const fullNameClean = cleanText(fullName);
+    const emailClean = cleanEmail(email);
+    const validationError = firstValidationError([
+      validateName(fullNameClean),
+      validateEmail(emailClean),
+      phone ? validatePhone(phone) : "",
+      validatePassword(password),
+    ]);
 
-    if (!fullName || !email || !password) {
-      return res.status(400).json({ message: "Full name, email and password are required" });
+    if (validationError) {
+      return res.status(400).json({ message: validationError });
     }
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      return res.status(400).json({ message: "Invalid email format" });
-    }
-
-    if (phone && !/^\d{10}$/.test(phone)) {
-      return res.status(400).json({ message: "Phone number must be exactly 10 digits" });
-    }
-
-    if (password.length < 6) {
-      return res.status(400).json({ message: "Password must be at least 6 characters" });
-    }
-
-    const exists = await User.findOne({ email: email.toLowerCase() });
+    const exists = await User.findOne({ email: emailClean });
     if (exists) return res.status(400).json({ message: "Email already exists" });
 
     const hashed = await bcrypt.hash(password, 10);
     const warden = await User.create({
-      fullName,
-      email: email.toLowerCase(),
-      phone,
+      fullName: fullNameClean,
+      email: emailClean,
+      phone: cleanText(phone),
       password: hashed,
       role: "Warden",
     });
@@ -65,9 +70,27 @@ exports.updateWarden = async (req, res) => {
 
     if (!warden) return res.status(404).json({ message: "Warden not found" });
 
-    if (fullName) warden.fullName = fullName;
-    if (email) warden.email = email.toLowerCase();
-    if (phone !== undefined) warden.phone = phone;
+    const fullNameClean = fullName !== undefined ? cleanText(fullName) : undefined;
+    const emailClean = email !== undefined ? cleanEmail(email) : undefined;
+    const validationError = firstValidationError([
+      fullNameClean !== undefined ? validateName(fullNameClean) : "",
+      emailClean !== undefined ? validateEmail(emailClean) : "",
+      phone ? validatePhone(phone) : "",
+      password ? validatePassword(password) : "",
+    ]);
+
+    if (validationError) {
+      return res.status(400).json({ message: validationError });
+    }
+
+    if (emailClean && emailClean !== warden.email) {
+      const exists = await User.findOne({ email: emailClean, _id: { $ne: warden._id } });
+      if (exists) return res.status(400).json({ message: "Email already exists" });
+    }
+
+    if (fullNameClean) warden.fullName = fullNameClean;
+    if (emailClean) warden.email = emailClean;
+    if (phone !== undefined) warden.phone = cleanText(phone);
     if (password) warden.password = await bcrypt.hash(password, 10);
 
     await warden.save();

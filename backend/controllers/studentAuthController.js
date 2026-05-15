@@ -3,6 +3,18 @@ const Booking = require("../models/Booking");
 const Payment = require("../models/Payment");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const {
+  cleanEmail,
+  cleanText,
+  firstValidationError,
+  validateAddress,
+  validateDob,
+  validateEducation,
+  validateEmail,
+  validateName,
+  validatePassword,
+  validatePhone,
+} = require("../utils/validation");
 
 const khaltiBaseUrl =
   process.env.KHALTI_BASE_URL || "https://dev.khalti.com/api/v2/epayment";
@@ -100,18 +112,25 @@ async function confirmTokenPayment(booking, paymentDetails = {}) {
 exports.register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
+    const cleanName = cleanText(name);
+    const emailClean = cleanEmail(email);
+    const validationError = firstValidationError([
+      validateName(cleanName),
+      validateEmail(emailClean),
+      validatePassword(password),
+    ]);
 
-    if (!name || !email || !password) {
-      return res.status(400).json({ message: "All fields are required" });
+    if (validationError) {
+      return res.status(400).json({ message: validationError });
     }
 
-    const exists = await Student.findOne({ email: email.toLowerCase() });
+    const exists = await Student.findOne({ email: emailClean });
     if (exists) return res.status(400).json({ message: "Email already registered" });
 
     const hashed = await bcrypt.hash(password, 10);
     const student = await Student.create({
-      name,
-      email: email.toLowerCase(),
+      name: cleanName,
+      email: emailClean,
       password: hashed,
     });
 
@@ -128,26 +147,30 @@ exports.register = async (req, res) => {
   }
 };
 
-// POST /api/student/login - accepts { name, password }
+// POST /api/student/login - accepts { email, password }
 exports.login = async (req, res) => {
   try {
-    const { name, password } = req.body;
+    const { email, password } = req.body;
+    const emailClean = cleanEmail(email);
+    const passwordClean = String(password || "");
+    const validationError = firstValidationError([
+      validateEmail(emailClean),
+      validatePassword(passwordClean),
+    ]);
 
-    if (!name || !password) {
-      return res.status(400).json({ message: "Name and password are required" });
+    if (validationError) {
+      return res.status(400).json({ message: validationError });
     }
 
-    const student = await Student.findOne({
-      name: { $regex: new RegExp(`^${name.trim()}$`, "i") },
-    });
+    const student = await Student.findOne({ email: emailClean });
 
     if (!student) {
-      return res.status(400).json({ message: "Invalid name or password" });
+      return res.status(400).json({ message: "Invalid email or password" });
     }
 
-    const match = await bcrypt.compare(password, student.password);
+    const match = await bcrypt.compare(passwordClean, student.password);
     if (!match) {
-      return res.status(400).json({ message: "Invalid name or password" });
+      return res.status(400).json({ message: "Invalid email or password" });
     }
 
     const token = jwt.sign({ id: student._id }, process.env.JWT_SECRET, {
@@ -403,9 +426,30 @@ exports.updateMe = async (req, res) => {
   try {
     const { name, email, phone, dob, permanentAddress, temporaryAddress, educationStatus } = req.body;
     const student = req.student;
+    const nextName = name !== undefined ? cleanText(name) : undefined;
+    const nextEmail = email !== undefined ? cleanEmail(email) : undefined;
+    const validationError = firstValidationError([
+      nextName !== undefined ? validateName(nextName) : "",
+      nextEmail !== undefined ? validateEmail(nextEmail) : "",
+      phone !== undefined ? validatePhone(phone) : "",
+      dob !== undefined ? validateDob(dob) : "",
+      permanentAddress !== undefined
+        ? validateAddress(permanentAddress, "Permanent address")
+        : "",
+      educationStatus !== undefined ? validateEducation(educationStatus) : "",
+    ]);
 
-    if (name) student.name = name;
-    if (email) student.email = email;
+    if (validationError) {
+      return res.status(400).json({ message: validationError });
+    }
+
+    if (nextEmail && nextEmail !== student.email) {
+      const exists = await Student.findOne({ email: nextEmail, _id: { $ne: student._id } });
+      if (exists) return res.status(400).json({ message: "Email already registered" });
+    }
+
+    if (nextName) student.name = nextName;
+    if (nextEmail) student.email = nextEmail;
     await student.save();
 
     const booking = await Booking.findOne({
@@ -413,12 +457,16 @@ exports.updateMe = async (req, res) => {
     }).sort({ createdAt: -1 });
 
     if (booking) {
-      if (name) booking.fullName = name;
-      if (email) booking.email = email;
-      if (phone !== undefined) booking.phone = phone;
+      if (nextName) booking.fullName = nextName;
+      if (nextEmail) booking.email = nextEmail;
+      if (phone !== undefined) booking.phone = cleanText(phone);
       if (dob !== undefined) booking.dob = dob;
-      if (permanentAddress !== undefined) booking.permanentAddress = permanentAddress;
-      if (temporaryAddress !== undefined) booking.temporaryAddress = temporaryAddress;
+      if (permanentAddress !== undefined) {
+        booking.permanentAddress = cleanText(permanentAddress);
+      }
+      if (temporaryAddress !== undefined) {
+        booking.temporaryAddress = cleanText(temporaryAddress);
+      }
       if (educationStatus !== undefined) booking.educationStatus = educationStatus;
       await booking.save();
     }

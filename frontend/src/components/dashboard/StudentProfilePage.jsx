@@ -1,5 +1,18 @@
 import { useEffect, useState } from "react";
 import { getStudentProfile, updateStudentProfile } from "../../services/api";
+import {
+  EDUCATION_OPTIONS,
+  cleanEmail,
+  cleanText,
+  firstValidationError,
+  maxDobForMinimumAge,
+  validateAddress,
+  validateDob,
+  validateEducation,
+  validateEmail,
+  validateName,
+  validatePhone,
+} from "../../utils/validation";
 
 const StudentProfilePage = () => {
   const [data, setData] = useState(null);
@@ -40,10 +53,33 @@ const StudentProfilePage = () => {
 
   const handleSave = async (e) => {
     e.preventDefault();
-    setSaving(true);
     setError("");
+    const validationError = firstValidationError([
+      validateName(form.name),
+      validateEmail(form.email),
+      form.phone ? validatePhone(form.phone) : "",
+      form.dob ? validateDob(form.dob) : "",
+      form.educationStatus ? validateEducation(form.educationStatus) : "",
+      form.permanentAddress
+        ? validateAddress(form.permanentAddress, "Permanent address")
+        : "",
+    ]);
+
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
+    setSaving(true);
     try {
-      await updateStudentProfile(form);
+      await updateStudentProfile({
+        ...form,
+        email: cleanEmail(form.email),
+        name: cleanText(form.name),
+        permanentAddress: cleanText(form.permanentAddress),
+        phone: cleanText(form.phone),
+        temporaryAddress: cleanText(form.temporaryAddress),
+      });
       setIsEditing(false);
       loadData();
     } catch (err) {
@@ -132,19 +168,26 @@ const StudentProfilePage = () => {
             </div>
             <div className="dash-form-field">
               <label>Email</label>
-              <input name="email" type="email" className="dash-input" value={form.email} onChange={handleUpdate} required />
+              <input name="email" type="email" autoComplete="email" className="dash-input" value={form.email} onChange={handleUpdate} required />
             </div>
             <div className="dash-form-field">
               <label>Phone</label>
-              <input name="phone" type="tel" pattern="\d{10}" className="dash-input" value={form.phone} onChange={handleUpdate} />
+              <input name="phone" type="tel" inputMode="numeric" pattern="\d{10}" maxLength={10} className="dash-input" value={form.phone} onChange={handleUpdate} />
             </div>
             <div className="dash-form-field">
               <label>Date of Birth</label>
-              <input name="dob" type="date" className="dash-input" value={form.dob} onChange={handleUpdate} />
+              <input name="dob" type="date" max={maxDobForMinimumAge(16)} className="dash-input" value={form.dob} onChange={handleUpdate} />
             </div>
             <div className="dash-form-field">
               <label>Education Status</label>
-              <input name="educationStatus" className="dash-input" value={form.educationStatus} onChange={handleUpdate} />
+              <select name="educationStatus" className="dash-input" value={form.educationStatus} onChange={handleUpdate}>
+                <option value="">Select</option>
+                {EDUCATION_OPTIONS.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="dash-form-field">
               <label>Permanent Address</label>

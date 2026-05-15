@@ -3,6 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { login } from "../../services/api";
 import { useAuth } from "../../AuthContext";
 import { useStudentAuth } from "./StudentAuthContext";
+import {
+  cleanEmail,
+  firstValidationError,
+  validateEmail,
+  validatePassword,
+} from "../../utils/validation";
 
 const UnifiedLogin = () => {
   const [activeRole, setActiveRole] = useState("admin");
@@ -10,7 +16,7 @@ const UnifiedLogin = () => {
   const [adminEmail, setAdminEmail] = useState("");
   const [adminPassword, setAdminPassword] = useState("");
 
-  const [studentName, setStudentName] = useState("");
+  const [studentEmail, setStudentEmail] = useState("");
   const [studentPassword, setStudentPassword] = useState("");
 
   const [error, setError] = useState("");
@@ -23,9 +29,18 @@ const UnifiedLogin = () => {
   async function handleAdminSubmit(e) {
     e.preventDefault();
     setError("");
+    const validationError = firstValidationError([
+      validateEmail(adminEmail),
+      validatePassword(adminPassword),
+    ]);
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
     setLoading(true);
     try {
-      const data = await login(adminEmail.trim(), adminPassword);
+      const data = await login(cleanEmail(adminEmail), adminPassword);
       doLogin(data.token, data.role, data.email);
       navigate("/dashboard");
     } catch (err) {
@@ -38,9 +53,18 @@ const UnifiedLogin = () => {
   async function handleStudentSubmit(e) {
     e.preventDefault();
     setError("");
+    const validationError = firstValidationError([
+      validateEmail(studentEmail),
+      validatePassword(studentPassword),
+    ]);
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
     setLoading(true);
     try {
-      await doStudentLogin(studentName, studentPassword);
+      await doStudentLogin(cleanEmail(studentEmail), studentPassword);
       navigate("/student-dashboard");
     } catch (err) {
       setError(err.message);
@@ -66,7 +90,7 @@ const UnifiedLogin = () => {
       <div className="ul-form-side">
         <div className="ul-form-card">
           <a href="/" className="ul-back-link">
-            ← Back to Home
+            Back to Home
           </a>
 
           <div className="ul-toggle-wrap">
@@ -90,7 +114,7 @@ const UnifiedLogin = () => {
             </h1>
             <p className="ul-form-sub">
               {activeRole === "student"
-                ? "Enter your name and password to access your dashboard"
+                ? "Enter your email and password to access your dashboard"
                 : "Sign in with your email and password"}
             </p>
           </div>
@@ -100,16 +124,17 @@ const UnifiedLogin = () => {
           {activeRole === "student" && (
             <form className="ul-form" onSubmit={handleStudentSubmit}>
               <div className="ul-field">
-                <label className="ul-label" htmlFor="s-name">
-                  Full Name
+                <label className="ul-label" htmlFor="s-email">
+                  Email Address
                 </label>
                 <input
                   className="ul-input"
-                  id="s-name"
-                  type="text"
-                  placeholder="Your registered name"
-                  value={studentName}
-                  onChange={(e) => setStudentName(e.target.value)}
+                  id="s-email"
+                  type="email"
+                  placeholder="your@email.com"
+                  autoComplete="email"
+                  value={studentEmail}
+                  onChange={(e) => setStudentEmail(e.target.value)}
                   required
                 />
               </div>
@@ -121,7 +146,8 @@ const UnifiedLogin = () => {
                   className="ul-input"
                   id="s-pass"
                   type="password"
-                  placeholder="••••••••"
+                  placeholder="Password"
+                  autoComplete="current-password"
                   value={studentPassword}
                   onChange={(e) => setStudentPassword(e.target.value)}
                   required
@@ -132,7 +158,7 @@ const UnifiedLogin = () => {
                 className="ul-submit-btn"
                 disabled={loading}
               >
-                {loading ? "Signing in…" : "Sign In"}
+                {loading ? "Signing in..." : "Sign In"}
               </button>
               <p style={{ marginTop: 16, fontSize: 14, textAlign: "center", color: "var(--muted)" }}>
                 New here?{" "}
@@ -154,6 +180,7 @@ const UnifiedLogin = () => {
                   id="a-email"
                   type="email"
                   placeholder="owner@gmail.com"
+                  autoComplete="email"
                   value={adminEmail}
                   onChange={(e) => setAdminEmail(e.target.value)}
                   required
@@ -167,7 +194,8 @@ const UnifiedLogin = () => {
                   className="ul-input"
                   id="a-pass"
                   type="password"
-                  placeholder="••••••••"
+                  placeholder="Password"
+                  autoComplete="current-password"
                   value={adminPassword}
                   onChange={(e) => setAdminPassword(e.target.value)}
                   required
@@ -178,7 +206,7 @@ const UnifiedLogin = () => {
                 className="ul-submit-btn"
                 disabled={loading}
               >
-                {loading ? "Signing in…" : "Sign In"}
+                {loading ? "Signing in..." : "Sign In"}
               </button>
             </form>
           )}

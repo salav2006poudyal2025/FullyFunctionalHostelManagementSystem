@@ -9,7 +9,7 @@ const {
 } = require("../controllers/bookingController");
 const { protect, authorize } = require("../middleware/authMiddleware");
 
-// Public — student submits booking
+// Public - student submits booking
 router.post("/", createBooking);
 
 // Staff-protected

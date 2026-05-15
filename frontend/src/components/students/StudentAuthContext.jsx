@@ -24,8 +24,8 @@ export function StudentAuthProvider({ children }) {
   }
 
   // POST /api/student/login
-  async function doStudentLogin(name, password) {
-    const data = await apiStudentLogin(name, password);
+  async function doStudentLogin(email, password) {
+    const data = await apiStudentLogin(email, password);
     const { token, student } = data;
 
     localStorage.setItem("studentToken", token);

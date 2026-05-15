@@ -2,17 +2,18 @@ const mongoose = require("mongoose");
 
 const bookingSchema = new mongoose.Schema(
   {
-    // Link to Student account (optional — public bookings won't have this)
+    // Link to Student account (optional - public bookings will not have this)
     student: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Student",
     },
 
     // Personal details filled in the booking form
-    fullName: { type: String, required: true },
+    fullName: { type: String, required: true, trim: true },
     phone: { 
       type: String, 
       required: true, 
+      trim: true,
       validate: {
         validator: function(v) {
           return /^\d{10}$/.test(v);
@@ -24,6 +25,7 @@ const bookingSchema = new mongoose.Schema(
       type: String, 
       required: true, 
       lowercase: true,
+      trim: true,
       validate: {
         validator: function(v) {
           return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
@@ -31,8 +33,8 @@ const bookingSchema = new mongoose.Schema(
         message: 'Invalid email format'
       }
     },
-    permanentAddress: String,
-    temporaryAddress: String,
+    permanentAddress: { type: String, trim: true },
+    temporaryAddress: { type: String, trim: true },
     dob: {
       type: Date,
       required: true,
@@ -44,7 +46,7 @@ const bookingSchema = new mongoose.Schema(
         message: 'Age must be 16 or above'
       }
     },
-    educationStatus: String,
+    educationStatus: { type: String, trim: true },
 
     room: {
       type: mongoose.Schema.Types.ObjectId,

@@ -71,8 +71,8 @@ export const login = (email, password) =>
 export const studentRegister = (name, email, password) =>
   req("POST", "/student/register", { name, email, password });
 
-export const studentLogin = (name, password) =>
-  req("POST", "/student/login", { name, password });
+export const studentLogin = (email, password) =>
+  req("POST", "/student/login", { email, password });
 
 export const getStudentProfile = () =>
   studentReq("GET", "/student/me");
