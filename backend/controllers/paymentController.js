@@ -2,7 +2,7 @@ const Payment = require("../models/Payment");
 const Booking = require("../models/Booking");
 const Room = require("../models/Room");
 
-// GET /api/payments - all payments (optionally filtered by month)
+// GET /api/payments  — all payments (optionally filtered by month)
 exports.getPayments = async (req, res) => {
   try {
     const month = req.query.month || new Date().toISOString().slice(0, 7);
@@ -20,7 +20,7 @@ exports.getPayments = async (req, res) => {
   }
 };
 
-// GET /api/payments/all - all payments across all months
+// GET /api/payments/all — all payments across all months
 exports.getAllPayments = async (req, res) => {
   try {
     const payments = await Payment.find()
@@ -36,7 +36,7 @@ exports.getAllPayments = async (req, res) => {
   }
 };
 
-// PUT /api/payments/:id - mark as Complete or Pending
+// PUT /api/payments/:id  — mark as Complete or Pending
 exports.updatePayment = async (req, res) => {
   try {
     const payment = await Payment.findById(req.params.id);
@@ -54,7 +54,7 @@ exports.updatePayment = async (req, res) => {
   }
 };
 
-// POST /api/payments/generate - generate next month's payments for approved bookings
+// POST /api/payments/generate  — generate next month's payments for all approved bookings
 exports.generateMonthlyPayments = async (req, res) => {
   try {
     const month = req.body.month || new Date().toISOString().slice(0, 7);
@@ -66,12 +66,10 @@ exports.generateMonthlyPayments = async (req, res) => {
     for (const booking of approvedBookings) {
       const exists = await Payment.findOne({ booking: booking._id, month });
       if (!exists) {
-        const amount = booking.room?.monthlyFee || 0;
-        if (amount < 0) continue; // skip invalid
         await Payment.create({
           booking: booking._id,
           month,
-          amount,
+          amount: booking.room?.monthlyFee || 0,
         });
         created++;
       }
@@ -83,7 +81,7 @@ exports.generateMonthlyPayments = async (req, res) => {
   }
 };
 
-// POST /api/payments/reset - reset current month's payments to Pending
+// POST /api/payments/reset  — reset current month's payments to Pending
 exports.resetPayments = async (req, res) => {
   try {
     const month = new Date().toISOString().slice(0, 7);

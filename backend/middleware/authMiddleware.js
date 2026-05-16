@@ -37,12 +37,7 @@ exports.protectStudent = async (req, res, next) => {
 // Role-based authorization for staff
 exports.authorize = (...roles) => {
   return (req, res, next) => {
-    const userRole = req.user.role?.trim();
-    const normalizedRoles = roles.map((role) => role.trim());
-    const isDefaultOwner =
-      normalizedRoles.includes("Owner") && req.user.email === "owner@gmail.com";
-
-    if (!normalizedRoles.includes(userRole) && !isDefaultOwner)
+    if (!roles.includes(req.user.role))
       return res.status(403).json({ message: "Access denied" });
     next();
   };

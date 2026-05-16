@@ -1,77 +1,32 @@
 const Booking = require("../models/Booking");
 const Room = require("../models/Room");
 const Payment = require("../models/Payment");
-const {
-  cleanEmail,
-  cleanText,
-  firstValidationError,
-  validateAddress,
-  validateDob,
-  validateEducation,
-  validateEmail,
-  validateName,
-  validatePhone,
-} = require("../utils/validation");
 
-// POST /api/bookings (public - student submits booking)
+// POST /api/bookings  (public — student submits booking)
 exports.createBooking = async (req, res) => {
   try {
-    const {
-      dob,
-      educationStatus,
-      email,
-      fullName,
-      permanentAddress,
-      phone,
-      room: roomId,
-      student,
-      temporaryAddress,
-    } = req.body;
-    const emailClean = cleanEmail(email);
-    const fullNameClean = cleanText(fullName);
-    const validationError = firstValidationError([
-      validateName(fullNameClean),
-      validatePhone(phone),
-      validateEmail(emailClean),
-      validateDob(dob),
-      validateEducation(educationStatus),
-      validateAddress(permanentAddress, "Permanent address"),
-    ]);
-
-    if (validationError) {
-      return res.status(400).json({ message: validationError });
-    }
+    const { room: roomId, fullName, phone, email, permanentAddress, temporaryAddress, dob, educationStatus, student } = req.body;
 
     const room = await Room.findById(roomId);
     if (!room) return res.status(404).json({ message: "Room not found" });
     if (room.status === "Full") return res.status(400).json({ message: "Room is full" });
 
     // Prevent duplicate pending booking for same email
-    const existing = await Booking.findOne({ email: emailClean, status: "Pending" });
+    const existing = await Booking.findOne({ email: email.toLowerCase(), status: "Pending" });
     if (existing) {
       return res.status(400).json({ message: "You already have a pending booking request" });
     }
 
-    const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
-    const reference = `${emailClean}-${Date.now()}`;
-
     const booking = await Booking.create({
       student: student || undefined,
-      fullName: fullNameClean,
-      phone: cleanText(phone),
-      email: emailClean,
-      permanentAddress: cleanText(permanentAddress),
-      temporaryAddress: cleanText(temporaryAddress),
+      fullName,
+      phone,
+      email: email.toLowerCase(),
+      permanentAddress,
+      temporaryAddress,
       dob,
       educationStatus,
       room: roomId,
-      tokenPayment: {
-        amount: 500,
-        method: "Khalti",
-        status: "Pending",
-        expiresAt,
-        reference,
-      },
     });
 
     res.status(201).json(booking);
@@ -86,9 +41,6 @@ exports.approveBooking = async (req, res) => {
     const booking = await Booking.findById(req.params.id).populate("room");
     if (!booking) return res.status(404).json({ message: "Booking not found" });
     if (booking.status !== "Pending") return res.status(400).json({ message: "Booking already actioned" });
-    if (booking.tokenPayment?.status !== "Confirmed") {
-      return res.status(400).json({ message: "Rs.500 Khalti token payment must be confirmed before approval" });
-    }
 
     const room = booking.room;
     if (room.occupiedSeats >= room.totalSeats) {
@@ -156,28 +108,9 @@ exports.updateStudent = async (req, res) => {
     }
 
     const allowed = ["fullName", "phone", "email", "permanentAddress", "temporaryAddress", "dob", "educationStatus"];
-    const next = { ...booking.toObject(), ...req.body };
-    const emailClean = cleanEmail(next.email);
-    const validationError = firstValidationError([
-      validateName(next.fullName),
-      validatePhone(next.phone),
-      validateEmail(emailClean),
-      validateDob(next.dob),
-      validateEducation(next.educationStatus),
-      validateAddress(next.permanentAddress, "Permanent address"),
-    ]);
-
-    if (validationError) {
-      return res.status(400).json({ message: validationError });
-    }
-
     allowed.forEach((field) => {
-      if (req.body[field] === undefined) return;
-      booking[field] = typeof req.body[field] === "string"
-        ? cleanText(req.body[field])
-        : req.body[field];
+      if (req.body[field] !== undefined) booking[field] = req.body[field];
     });
-    booking.email = emailClean;
     await booking.save();
 
     res.json(booking);
