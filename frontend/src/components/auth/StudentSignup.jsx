@@ -9,12 +9,15 @@ import {
   validateName,
   validatePassword,
 } from "../../utils/validation";
+import TermsModal from "./TermsModal";
 
 const StudentSignup = () => {
   const { doStudentSignup } = useStudentAuth();
   const navigate = useNavigate();
 
   const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [agreed, setAgreed] = useState(false);
+  const [showTerms, setShowTerms] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -119,7 +122,20 @@ const StudentSignup = () => {
               />
             </div>
 
-            <button className="ul-submit-btn" type="submit" disabled={loading}>
+            <div className="ul-field" style={{ flexDirection: "row", alignItems: "center", gap: "8px", marginTop: "10px" }}>
+              <input 
+                type="checkbox" 
+                id="agree-terms" 
+                checked={agreed}
+                onChange={(e) => setAgreed(e.target.checked)}
+                style={{ width: "16px", height: "16px", cursor: "pointer", accentColor: "var(--rose)" }}
+              />
+              <label htmlFor="agree-terms" style={{ fontSize: "14px", color: "var(--text-main)", cursor: "pointer", userSelect: "none" }}>
+                I agree to the <span style={{ color: "var(--rose)", fontWeight: 600, textDecoration: "underline" }} onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowTerms(true); }}>Terms and Conditions</span>
+              </label>
+            </div>
+
+            <button className="ul-submit-btn" type="submit" disabled={loading || !agreed}>
               {loading ? "Creating account..." : "Create Account"}
             </button>
 
@@ -142,6 +158,7 @@ const StudentSignup = () => {
           </form>
         </div>
       </div>
+      <TermsModal isOpen={showTerms} onClose={() => setShowTerms(false)} />
     </div>
   );
 };
