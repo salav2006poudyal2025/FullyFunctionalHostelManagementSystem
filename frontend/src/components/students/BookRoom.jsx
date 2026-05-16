@@ -3,21 +3,17 @@ import { getRooms, createBooking } from "../../services/api";
 import twoseater from "../img/2-seater.jpeg";
 import threeseater from "../img/3-seater.jpeg";
 import fourseater from "../img/4-seater.jpeg";
-import {
-  EDUCATION_OPTIONS,
-  cleanEmail,
-  cleanText,
-  firstValidationError,
-  maxDobForMinimumAge,
-  validateAddress,
-  validateDob,
-  validateEducation,
-  validateEmail,
-  validateName,
-  validatePhone,
-} from "../../utils/validation";
 
 const seaterImgs = { 2: twoseater, 3: threeseater, 4: fourseater };
+
+const EducationOptions = [
+  "Under Graduate (UG)",
+  "Post Graduate (PG)",
+  "Diploma",
+  "PhD / Research",
+  "Entrance Exam Preparation",
+  "Other",
+];
 
 const BookRoomPage = () => {
   const [rooms, setRooms] = useState([]);
@@ -51,30 +47,11 @@ const BookRoomPage = () => {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    const validationError = firstValidationError([
-      selectedRoom ? "" : "Please select a room.",
-      validateName(form.fullName),
-      validatePhone(form.phone),
-      validateEmail(form.email),
-      validateDob(form.dob),
-      validateEducation(form.educationStatus),
-      validateAddress(form.permanentAddress, "Permanent address"),
-    ]);
-
-    if (validationError) return setError(validationError);
-
+    if (!selectedRoom) return setError("Please select a room.");
     setError("");
     setLoading(true);
     try {
-      await createBooking({
-        ...form,
-        email: cleanEmail(form.email),
-        fullName: cleanText(form.fullName),
-        permanentAddress: cleanText(form.permanentAddress),
-        phone: cleanText(form.phone),
-        room: selectedRoom._id,
-        temporaryAddress: cleanText(form.temporaryAddress),
-      });
+      await createBooking({ ...form, room: selectedRoom._id });
       setSuccess(true);
     } catch (err) {
       setError(err.message);
@@ -259,7 +236,6 @@ const BookRoomPage = () => {
                   className="br-input"
                   type="text"
                   name="fullName"
-                  autoComplete="name"
                   value={form.fullName}
                   onChange={update}
                   required
@@ -278,8 +254,6 @@ const BookRoomPage = () => {
                     className="br-input br-input-prefixed"
                     type="tel"
                     name="phone"
-                    inputMode="numeric"
-                    pattern="\d{10}"
                     maxLength={10}
                     value={form.phone}
                     onChange={update}
@@ -296,7 +270,6 @@ const BookRoomPage = () => {
                   className="br-input"
                   type="email"
                   name="email"
-                  autoComplete="email"
                   value={form.email}
                   onChange={update}
                   required
@@ -313,7 +286,6 @@ const BookRoomPage = () => {
                   className="br-input"
                   type="date"
                   name="dob"
-                  max={maxDobForMinimumAge(16)}
                   value={form.dob}
                   onChange={update}
                   required
@@ -331,8 +303,8 @@ const BookRoomPage = () => {
                   onChange={update}
                   required
                 >
-                  <option value="">Select</option>
-                  {EDUCATION_OPTIONS.map((o) => (
+                  <option value="">— Select —</option>
+                  {EducationOptions.map((o) => (
                     <option key={o} value={o}>
                       {o}
                     </option>

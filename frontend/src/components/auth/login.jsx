@@ -16,8 +16,8 @@ const LoginPage = () => {
     setError("");
     setLoading(true);
     try {
-      const data = await login(email.trim(), password);
-      doLogin(data.token, data.role, data.email);
+      const data = await login(email, password);
+      doLogin(data.token, data.role);
       navigate("/dashboard");
     } catch (err) {
       setError(err.message);

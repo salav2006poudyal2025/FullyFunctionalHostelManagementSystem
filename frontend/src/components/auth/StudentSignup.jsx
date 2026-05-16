@@ -1,23 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useStudentAuth } from "../students/StudentAuthContext";
-import {
-  cleanEmail,
-  cleanText,
-  firstValidationError,
-  validateEmail,
-  validateName,
-  validatePassword,
-} from "../../utils/validation";
-import TermsModal from "./TermsModal";
 
 const StudentSignup = () => {
   const { doStudentSignup } = useStudentAuth();
   const navigate = useNavigate();
 
   const [form, setForm] = useState({ name: "", email: "", password: "" });
-  const [agreed, setAgreed] = useState(false);
-  const [showTerms, setShowTerms] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -28,23 +17,9 @@ const StudentSignup = () => {
   async function handleSubmit(e) {
     e.preventDefault();
     setError("");
-    const validationError = firstValidationError([
-      validateName(form.name),
-      validateEmail(form.email),
-      validatePassword(form.password),
-    ]);
-    if (validationError) {
-      setError(validationError);
-      return;
-    }
-
     setLoading(true);
     try {
-      await doStudentSignup({
-        name: cleanText(form.name),
-        email: cleanEmail(form.email),
-        password: form.password,
-      });
+      await doStudentSignup(form);
       navigate("/login");
     } catch (err) {
       setError(err.message);
@@ -62,7 +37,7 @@ const StudentSignup = () => {
             Shikha <span>Girls</span> Hostel
           </div>
           <p className="ul-panel-tagline">
-            &quot;Begin your journey - create your student account.&quot;
+            &quot;Begin your journey — create your student account.&quot;
           </p>
         </div>
       </div>
@@ -70,7 +45,7 @@ const StudentSignup = () => {
       <div className="ul-form-side">
         <div className="ul-form-card">
           <a href="/" className="ul-back-link">
-            Back to Home
+            ← Back to Home
           </a>
 
           <div className="ul-form-header">
@@ -88,7 +63,6 @@ const StudentSignup = () => {
                 name="name"
                 type="text"
                 placeholder="Your full name"
-                autoComplete="name"
                 value={form.name}
                 onChange={update}
                 required
@@ -101,7 +75,6 @@ const StudentSignup = () => {
                 name="email"
                 type="email"
                 placeholder="your@email.com"
-                autoComplete="email"
                 value={form.email}
                 onChange={update}
                 required
@@ -114,7 +87,6 @@ const StudentSignup = () => {
                 name="password"
                 type="password"
                 placeholder="Min 6 characters"
-                autoComplete="new-password"
                 minLength={6}
                 value={form.password}
                 onChange={update}
@@ -122,21 +94,8 @@ const StudentSignup = () => {
               />
             </div>
 
-            <div className="ul-field" style={{ flexDirection: "row", alignItems: "center", gap: "8px", marginTop: "10px" }}>
-              <input 
-                type="checkbox" 
-                id="agree-terms" 
-                checked={agreed}
-                onChange={(e) => setAgreed(e.target.checked)}
-                style={{ width: "16px", height: "16px", cursor: "pointer", accentColor: "var(--rose)" }}
-              />
-              <label htmlFor="agree-terms" style={{ fontSize: "14px", color: "var(--text-main)", cursor: "pointer", userSelect: "none" }}>
-                I agree to the <span style={{ color: "var(--rose)", fontWeight: 600, textDecoration: "underline" }} onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowTerms(true); }}>Terms and Conditions</span>
-              </label>
-            </div>
-
-            <button className="ul-submit-btn" type="submit" disabled={loading || !agreed}>
-              {loading ? "Creating account..." : "Create Account"}
+            <button className="ul-submit-btn" type="submit" disabled={loading}>
+              {loading ? "Creating account…" : "Create Account"}
             </button>
 
             <p
@@ -158,7 +117,6 @@ const StudentSignup = () => {
           </form>
         </div>
       </div>
-      <TermsModal isOpen={showTerms} onClose={() => setShowTerms(false)} />
     </div>
   );
 };

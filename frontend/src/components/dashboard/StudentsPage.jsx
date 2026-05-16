@@ -57,39 +57,38 @@ const StudentsPage = () => {
     }
   }
 
-  const filtered = students.filter((student) => {
-    const matchFilter = filter === "All" || student.status === filter;
-    const term = search.toLowerCase();
+  const filtered = students.filter((s) => {
+    const matchFilter = filter === "All" || s.status === filter;
     const matchSearch =
-      student.fullName?.toLowerCase().includes(term) ||
-      student.email?.toLowerCase().includes(term);
+      s.fullName?.toLowerCase().includes(search.toLowerCase()) ||
+      s.email?.toLowerCase().includes(search.toLowerCase());
     return matchFilter && matchSearch;
   });
 
-  if (loading) return <div className="dash-loading">Loading...</div>;
+  if (loading) return <div className="dash-loading">Loading…</div>;
 
   return (
     <div className="dash-page">
       <div className="dash-page-header">
         <h1 className="dash-page-title">Students</h1>
         <p className="dash-page-sub">
-          Manage booking requests and enrolled students.
+          Manage booking requests and enrolled students
         </p>
       </div>
 
       <div className="dash-toolbar">
         <div className="dash-filter-tabs">
-          {["All", "Pending", "Approved", "Rejected"].map((status) => (
+          {["All", "Pending", "Approved", "Rejected"].map((f) => (
             <button
-              key={status}
-              className={`dash-filter-tab ${filter === status ? "active" : ""}`}
-              onClick={() => setFilter(status)}
+              key={f}
+              className={`dash-filter-tab ${filter === f ? "active" : ""}`}
+              onClick={() => setFilter(f)}
             >
-              {status}
+              {f}
               <span className="dash-filter-count">
-                {status === "All"
+                {f === "All"
                   ? students.length
-                  : students.filter((student) => student.status === status).length}
+                  : students.filter((s) => s.status === f).length}
               </span>
             </button>
           ))}
@@ -97,7 +96,7 @@ const StudentsPage = () => {
         <input
           className="dash-search"
           type="text"
-          placeholder="Search by name or email..."
+          placeholder="Search by name or email…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -115,78 +114,53 @@ const StudentsPage = () => {
                 <th>Email</th>
                 <th>Room</th>
                 <th>Education</th>
-                <th>Token</th>
                 <th>Status</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {filtered.map((student) => {
-                const tokenStatus = student.tokenPayment?.status || "Pending";
-                const tokenPaid = tokenStatus === "Confirmed";
-
-                return (
-                  <tr key={student._id}>
-                    <td className="dash-td-name">{student.fullName}</td>
-                    <td>{student.phone}</td>
-                    <td>{student.email}</td>
-                    <td>
-                      #{student.room?.roomNumber || "-"} ({student.room?.seaterType || "?"}-Seater)
-                    </td>
-                    <td>{student.educationStatus || "-"}</td>
-                    <td>
-                      <span
-                        className={`dash-badge ${
-                          tokenPaid
-                            ? "approved"
-                            : tokenStatus === "Expired"
-                              ? "rejected"
-                              : "pending"
-                        }`}
+              {filtered.map((s) => (
+                <tr key={s._id}>
+                  <td className="dash-td-name">{s.fullName}</td>
+                  <td>{s.phone}</td>
+                  <td>{s.email}</td>
+                  <td>
+                    #{s.room?.roomNumber || "—"} ({s.room?.seaterType || "?"}⃣)
+                  </td>
+                  <td>{s.educationStatus || "—"}</td>
+                  <td>
+                    <span className={`dash-badge ${s.status.toLowerCase()}`}>
+                      {s.status}
+                    </span>
+                  </td>
+                  <td>
+                    <div className="dash-actions">
+                      {s.status === "Pending" && (
+                        <>
+                          <button
+                            className="dash-btn green"
+                            onClick={() => handleApprove(s._id)}
+                          >
+                            ✓ Approve
+                          </button>
+                          <button
+                            className="dash-btn red"
+                            onClick={() => handleReject(s._id)}
+                          >
+                            ✗ Reject
+                          </button>
+                        </>
+                      )}
+                      <button
+                        className="dash-btn ghost"
+                        onClick={() => handleDelete(s._id)}
                       >
-                        Rs.{student.tokenPayment?.amount || 500} {tokenStatus}
-                      </span>
-                    </td>
-                    <td>
-                      <span className={`dash-badge ${student.status.toLowerCase()}`}>
-                        {student.status}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="dash-actions">
-                        {student.status === "Pending" && (
-                          <>
-                            <button
-                              className="dash-btn green"
-                              onClick={() => handleApprove(student._id)}
-                              disabled={!tokenPaid}
-                              title={
-                                tokenPaid
-                                  ? "Approve this booking"
-                                  : "Rs.500 Khalti token payment is required first"
-                              }
-                            >
-                              Approve
-                            </button>
-                            <button
-                              className="dash-btn red"
-                              onClick={() => handleReject(student._id)}
-                            >
-                              Reject
-                            </button>
-                          </>
-                        )}
-                        <button
-                          className="dash-btn ghost"
-                          onClick={() => handleDelete(student._id)}
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
+                        🗑
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>

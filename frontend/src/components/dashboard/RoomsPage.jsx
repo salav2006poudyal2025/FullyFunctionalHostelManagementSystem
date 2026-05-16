@@ -82,8 +82,6 @@ const RoomsPage = () => {
               <label>Room Number</label>
               <input
                 name="roomNumber"
-                type="number"
-                min="1"
                 className="dash-input"
                 placeholder="e.g. 101"
                 value={form.roomNumber}
@@ -109,7 +107,6 @@ const RoomsPage = () => {
               <input
                 name="monthlyFee"
                 type="number"
-                min="0"
                 className="dash-input"
                 placeholder="e.g. 4500"
                 value={form.monthlyFee}

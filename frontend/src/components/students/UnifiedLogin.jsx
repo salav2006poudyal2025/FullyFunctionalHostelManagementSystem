@@ -3,20 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { login } from "../../services/api";
 import { useAuth } from "../../AuthContext";
 import { useStudentAuth } from "./StudentAuthContext";
-import {
-  cleanEmail,
-  firstValidationError,
-  validateEmail,
-  validatePassword,
-} from "../../utils/validation";
 
 const UnifiedLogin = () => {
-  const [activeRole, setActiveRole] = useState("admin");
+  const [activeRole, setActiveRole] = useState("student");
 
   const [adminEmail, setAdminEmail] = useState("");
   const [adminPassword, setAdminPassword] = useState("");
 
-  const [studentEmail, setStudentEmail] = useState("");
+  const [studentName, setStudentName] = useState("");
   const [studentPassword, setStudentPassword] = useState("");
 
   const [error, setError] = useState("");
@@ -29,19 +23,11 @@ const UnifiedLogin = () => {
   async function handleAdminSubmit(e) {
     e.preventDefault();
     setError("");
-    const validationError = firstValidationError([
-      validateEmail(adminEmail),
-      validatePassword(adminPassword),
-    ]);
-    if (validationError) {
-      setError(validationError);
-      return;
-    }
-
     setLoading(true);
     try {
-      const data = await login(cleanEmail(adminEmail), adminPassword);
-      doLogin(data.token, data.role, data.email);
+      const data = await login(adminEmail, adminPassword);
+      doLogin(data.token, data.role);
+      doStudentLogout();
       navigate("/dashboard");
     } catch (err) {
       setError(err.message);
@@ -53,18 +39,10 @@ const UnifiedLogin = () => {
   async function handleStudentSubmit(e) {
     e.preventDefault();
     setError("");
-    const validationError = firstValidationError([
-      validateEmail(studentEmail),
-      validatePassword(studentPassword),
-    ]);
-    if (validationError) {
-      setError(validationError);
-      return;
-    }
-
     setLoading(true);
     try {
-      await doStudentLogin(cleanEmail(studentEmail), studentPassword);
+      await doStudentLogin(studentName, studentPassword);
+      doLogout();
       navigate("/student-dashboard");
     } catch (err) {
       setError(err.message);
@@ -90,7 +68,7 @@ const UnifiedLogin = () => {
       <div className="ul-form-side">
         <div className="ul-form-card">
           <a href="/" className="ul-back-link">
-            Back to Home
+            ← Back to Home
           </a>
 
           <div className="ul-toggle-wrap">
@@ -104,7 +82,7 @@ const UnifiedLogin = () => {
               className={`ul-toggle-btn ${activeRole === "admin" ? "active" : ""}`}
               onClick={() => { setActiveRole("admin"); setError(""); }}
             >
-              Owner / Warden
+              Admin / Warden
             </button>
           </div>
 
@@ -114,7 +92,7 @@ const UnifiedLogin = () => {
             </h1>
             <p className="ul-form-sub">
               {activeRole === "student"
-                ? "Enter your email and password to access your dashboard"
+                ? "Enter your name and password to access your dashboard"
                 : "Sign in with your email and password"}
             </p>
           </div>
@@ -124,17 +102,16 @@ const UnifiedLogin = () => {
           {activeRole === "student" && (
             <form className="ul-form" onSubmit={handleStudentSubmit}>
               <div className="ul-field">
-                <label className="ul-label" htmlFor="s-email">
-                  Email Address
+                <label className="ul-label" htmlFor="s-name">
+                  Full Name
                 </label>
                 <input
                   className="ul-input"
-                  id="s-email"
-                  type="email"
-                  placeholder="your@email.com"
-                  autoComplete="email"
-                  value={studentEmail}
-                  onChange={(e) => setStudentEmail(e.target.value)}
+                  id="s-name"
+                  type="text"
+                  placeholder="Your registered name"
+                  value={studentName}
+                  onChange={(e) => setStudentName(e.target.value)}
                   required
                 />
               </div>
@@ -146,8 +123,7 @@ const UnifiedLogin = () => {
                   className="ul-input"
                   id="s-pass"
                   type="password"
-                  placeholder="Password"
-                  autoComplete="current-password"
+                  placeholder="••••••••"
                   value={studentPassword}
                   onChange={(e) => setStudentPassword(e.target.value)}
                   required
@@ -158,7 +134,7 @@ const UnifiedLogin = () => {
                 className="ul-submit-btn"
                 disabled={loading}
               >
-                {loading ? "Signing in..." : "Sign In"}
+                {loading ? "Signing in…" : "Sign In"}
               </button>
               <p style={{ marginTop: 16, fontSize: 14, textAlign: "center", color: "var(--muted)" }}>
                 New here?{" "}
@@ -180,7 +156,6 @@ const UnifiedLogin = () => {
                   id="a-email"
                   type="email"
                   placeholder="owner@gmail.com"
-                  autoComplete="email"
                   value={adminEmail}
                   onChange={(e) => setAdminEmail(e.target.value)}
                   required
@@ -194,8 +169,7 @@ const UnifiedLogin = () => {
                   className="ul-input"
                   id="a-pass"
                   type="password"
-                  placeholder="Password"
-                  autoComplete="current-password"
+                  placeholder="••••••••"
                   value={adminPassword}
                   onChange={(e) => setAdminPassword(e.target.value)}
                   required
@@ -206,7 +180,7 @@ const UnifiedLogin = () => {
                 className="ul-submit-btn"
                 disabled={loading}
               >
-                {loading ? "Signing in..." : "Sign In"}
+                {loading ? "Signing in…" : "Sign In"}
               </button>
             </form>
           )}

@@ -1,13 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  cleanEmail,
-  cleanText,
-  firstValidationError,
-  validateEmail,
-  validateName,
-  validatePassword,
-} from "../../utils/validation";
 import { useStudentAuth } from "./StudentAuthContext";
 import "./StudentAuth.css";
 
@@ -16,48 +8,29 @@ const StudentLoginPage = () => {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  // FIX: use context methods (doStudentLogin handles API call + state storage)
   const { doStudentLogin, doStudentSignup } = useStudentAuth();
   const navigate = useNavigate();
 
   function update(e) {
-    setForm((current) => ({ ...current, [e.target.name]: e.target.value }));
+    setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
     setError("");
-
-    const validationError =
-      tab === "login"
-        ? firstValidationError([
-            validateEmail(form.email),
-            validatePassword(form.password),
-          ])
-        : firstValidationError([
-            validateName(form.name),
-            validateEmail(form.email),
-            validatePassword(form.password),
-          ]);
-
-    if (validationError) {
-      setError(validationError);
-      return;
-    }
-
     setLoading(true);
     try {
       if (tab === "login") {
-        await doStudentLogin(cleanEmail(form.email), form.password);
-        navigate("/student-dashboard");
+        // FIX: login uses name, not email — matches backend /api/student/login
+        await doStudentLogin(form.name, form.password);
+      } else {
+        // FIX: use doStudentSignup from context then redirect to login
+        await doStudentSignup({ name: form.name, email: form.email, password: form.password });
+        navigate("/login");
         return;
       }
-
-      await doStudentSignup({
-        email: cleanEmail(form.email),
-        name: cleanText(form.name),
-        password: form.password,
-      });
-      navigate("/login");
+      navigate("/student-dashboard");
     } catch (err) {
       setError(err.message);
     } finally {
@@ -67,6 +40,7 @@ const StudentLoginPage = () => {
 
   return (
     <div className="lp-root">
+      {/* Left decorative panel */}
       <div className="lp-panel sl-panel">
         <div className="lp-panel-overlay" />
         <div className="lp-panel-content">
@@ -74,34 +48,46 @@ const StudentLoginPage = () => {
             Shikha <span>Girls</span> Hostel
           </div>
           <p className="lp-panel-tagline">
-            Login to securely reserve your room and join our community.
+            "Login to securely reserve your room and join our community."
           </p>
+          <div className="sl-panel-steps">
+            <div className="sl-step active">
+              <span className="sl-step-num">1</span>
+              <span className="sl-step-label">Login / Register</span>
+            </div>
+            <div className="sl-step-connector" />
+            <div className="sl-step">
+              <span className="sl-step-num">2</span>
+              <span className="sl-step-label">Pay Token</span>
+            </div>
+            <div className="sl-step-connector" />
+            <div className="sl-step">
+              <span className="sl-step-num">3</span>
+              <span className="sl-step-label">Book Room</span>
+            </div>
+          </div>
         </div>
       </div>
 
+      {/* Right side — form */}
       <div className="lp-form-side">
         <div className="lp-form-card">
           <a href="/" className="lp-back-link">
-            Back to Home
+            ← Back to Home
           </a>
 
+          {/* Tab switcher */}
           <div className="sl-tab-row">
             <button
               type="button"
-              onClick={() => {
-                setTab("login");
-                setError("");
-              }}
+              onClick={() => { setTab("login"); setError(""); }}
               className={`sl-tab ${tab === "login" ? "active" : ""}`}
             >
               Sign In
             </button>
             <button
               type="button"
-              onClick={() => {
-                setTab("register");
-                setError("");
-              }}
+              onClick={() => { setTab("register"); setError(""); }}
               className={`sl-tab ${tab === "register" ? "active" : ""}`}
             >
               Register
@@ -114,7 +100,7 @@ const StudentLoginPage = () => {
             </h1>
             <p className="lp-form-sub">
               {tab === "login"
-                ? "Sign in with your email to continue booking your room"
+                ? "Sign in to continue booking your room"
                 : "Register to get started with your booking"}
             </p>
           </div>
@@ -122,39 +108,41 @@ const StudentLoginPage = () => {
           {error && <div className="lp-error">{error}</div>}
 
           <form className="lp-form" onSubmit={handleSubmit}>
+            {/* Name field — used for login (username) and register */}
+            <div className="lp-field">
+              <label className="lp-label" htmlFor="name">
+                Full Name
+              </label>
+              <input
+                className="lp-input"
+                id="name"
+                name="name"
+                type="text"
+                autoComplete="name"
+                value={form.name}
+                onChange={update}
+                required
+              />
+            </div>
+
+            {/* Email — only for registration */}
             {tab === "register" && (
               <div className="lp-field">
-                <label className="lp-label" htmlFor="name">
-                  Full Name
+                <label className="lp-label" htmlFor="email">
+                  Email Address
                 </label>
                 <input
                   className="lp-input"
-                  id="name"
-                  name="name"
-                  type="text"
-                  autoComplete="name"
-                  value={form.name}
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  value={form.email}
                   onChange={update}
                   required
                 />
               </div>
             )}
-
-            <div className="lp-field">
-              <label className="lp-label" htmlFor="email">
-                Email Address
-              </label>
-              <input
-                className="lp-input"
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                value={form.email}
-                onChange={update}
-                required
-              />
-            </div>
 
             <div className="lp-field">
               <label className="lp-label" htmlFor="password">
@@ -175,8 +163,8 @@ const StudentLoginPage = () => {
             <button type="submit" className="lp-submit-btn" disabled={loading}>
               {loading
                 ? tab === "login"
-                  ? "Signing in..."
-                  : "Creating account..."
+                  ? "Signing in…"
+                  : "Creating account…"
                 : tab === "login"
                   ? "Sign In"
                   : "Create Account"}
@@ -188,10 +176,7 @@ const StudentLoginPage = () => {
             <button
               type="button"
               className="sl-switch-btn"
-              onClick={() => {
-                setTab(tab === "login" ? "register" : "login");
-                setError("");
-              }}
+              onClick={() => { setTab(tab === "login" ? "register" : "login"); setError(""); }}
             >
               {tab === "login" ? "Create an account" : "Sign in instead"}
             </button>
@@ -199,7 +184,7 @@ const StudentLoginPage = () => {
         </div>
 
         <p className="lp-footer-note">
-          (c) {new Date().getFullYear()} Shikha Girls Hostel - All rights reserved
+          © {new Date().getFullYear()} Shikha Girls Hostel · All rights reserved
         </p>
       </div>
     </div>

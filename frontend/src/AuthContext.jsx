@@ -6,28 +6,23 @@ const AuthCtx = createContext(null);
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(localStorage.getItem("token") || "");
   const [role, setRole] = useState(localStorage.getItem("role") || "");
-  const [email, setEmail] = useState(localStorage.getItem("email") || "");
 
-  const doLogin = (token, role, email = "") => {
+  const doLogin = (token, role) => {
     localStorage.setItem("token", token);
     localStorage.setItem("role", role);
-    localStorage.setItem("email", email);
     setToken(token);
     setRole(role);
-    setEmail(email);
   };
 
   const doLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("role");
-    localStorage.removeItem("email");
     setToken("");
     setRole("");
-    setEmail("");
   };
 
   return (
-    <AuthCtx.Provider value={{ token, role, email, doLogin, doLogout }}>
+    <AuthCtx.Provider value={{ token, role, doLogin, doLogout }}>
       {children}
     </AuthCtx.Provider>
   );

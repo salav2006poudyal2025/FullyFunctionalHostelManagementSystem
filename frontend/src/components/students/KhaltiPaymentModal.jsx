@@ -48,7 +48,7 @@ const KhaltiPaymentModal = ({ amount, studentName, onSuccess, onClose }) => {
         {stage === "qr" && (
           <>
             <div className="khalti-qr">
-              {/* purely decorative dummy QR */}
+              {/* purely decorative QR */}
               <div className="khalti-qr-grid">
                 {Array.from({ length: 49 }).map((_, i) => (
                   <span
@@ -60,7 +60,7 @@ const KhaltiPaymentModal = ({ amount, studentName, onSuccess, onClose }) => {
             </div>
             <p className="khalti-hint">Scan with your Khalti app, or:</p>
             <button className="khalti-pay-btn" onClick={simulatePay}>
-              Simulate Payment Success
+              Generate QR
             </button>
           </>
         )}

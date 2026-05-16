@@ -33,12 +33,15 @@ async function handleResponse(res) {
   }
 
   if (!res.ok) {
-    if (res.status === 401 || res.status === 403) {
+    if (res.status === 401) {
       localStorage.removeItem("token");
       localStorage.removeItem("role");
-      localStorage.removeItem("email");
+      localStorage.removeItem("studentToken");
+      if (data.message === "User not found") {
+        alert("Your account has been deactivated.");
+      }
+      window.location.href = "/login";
     }
-
     throw new Error(data.message || "Request failed");
   }
 
@@ -71,18 +74,16 @@ export const login = (email, password) =>
 export const studentRegister = (name, email, password) =>
   req("POST", "/student/register", { name, email, password });
 
-export const studentLogin = (email, password) =>
-  req("POST", "/student/login", { email, password });
+export const studentLogin = (name, password) =>
+  req("POST", "/student/login", { name, password });
 
 export const getStudentProfile = () =>
   studentReq("GET", "/student/me");
 
-export const updateStudentProfile = (data) =>
+export const updateMyProfile = (data) =>
   studentReq("PUT", "/student/me", data);
 
 export const getRooms = () => req("GET", "/rooms");
-export const queryRoomsByAI = (queryText) =>
-  req("POST", "/rooms/query", { query: queryText });
 
 export const createRoom = (data) => req("POST", "/rooms", data);
 
@@ -138,12 +139,3 @@ export const resetPayments = () =>
 
 export const submitTokenPayment = (data) =>
   studentReq("POST", "/student/token-payment", data);
-
-export const initiateKhaltiPayment = ({ bookingId }) =>
-  studentReq("POST", "/student/khalti/initiate", { bookingId });
-
-export const verifyKhaltiPayment = ({ bookingId, pidx }) =>
-  studentReq("POST", "/student/khalti/verify", { bookingId, pidx });
-
-export const verifyKhaltiTokenPayment = ({ bookingId, token }) =>
-  studentReq("POST", "/student/token-payment", { bookingId, token });
