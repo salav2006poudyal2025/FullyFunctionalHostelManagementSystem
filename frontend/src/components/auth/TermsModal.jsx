@@ -8,10 +8,10 @@ const TermsModal = ({ isOpen, onClose }) => {
       <div style={modalStyle}>
         <h2 style={{ marginBottom: "1rem", color: "var(--text-main, #333)", fontSize: "1.5rem", fontWeight: "bold" }}>Terms and Conditions</h2>
         <div style={contentStyle}>
-          <h4 style={{marginTop: "0"}}>Hostel Management System</h4>
+          <h4 style={{ marginTop: "0" }}>Hostel Management System</h4>
           <p><strong>Last Updated:</strong> 16 May 2026</p>
           <p>Welcome to the Hostel Management System. By accessing or using this system, users agree to comply with and be bound by the following terms and conditions.</p>
-          
+
           <h5 style={headingStyle}>1. Acceptance of Terms</h5>
           <p>By registering, logging in, or using this Hostel Management System, users acknowledge that they have read, understood, and agreed to these Terms and Conditions.</p>
 
@@ -70,7 +70,7 @@ const TermsModal = ({ isOpen, onClose }) => {
 
           <h5 style={headingStyle}>11. Contact Information</h5>
           <p>For support or queries regarding the Hostel Management System, contact hostel administration.</p>
-          <p style={{marginBottom: "0"}}>Email: owner@gmail.com<br/>Phone: +977-XXXXXXXXXX</p>
+          <p style={{ marginBottom: "0" }}>Email: owner@gmail.com<br />Phone: +977-XXXXXXXXXX</p>
         </div>
         <div style={footerStyle}>
           <button onClick={onClose} className="ul-submit-btn" style={{ padding: "0.5rem 1rem", fontSize: "14px", width: "auto" }}>Close</button>
