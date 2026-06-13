@@ -1,0 +1,235 @@
+/* ── Left panel steps indicator ── */
+.sl-panel {
+  background: linear-gradient(145deg, #1c1917 0%, #2d1f1b 60%, #3d2419 100%);
+}
+
+.sl-panel-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: 40px;
+}
+
+.sl-step {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  opacity: 0.45;
+  transition: opacity 0.3s;
+}
+
+.sl-step.active {
+  opacity: 1;
+}
+
+.sl-step.done {
+  opacity: 0.85;
+}
+
+.sl-step-num {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.55);
+  flex-shrink: 0;
+  transition: all 0.3s;
+}
+
+.sl-step.active .sl-step-num {
+  background: var(--rose);
+  border-color: var(--rose);
+  color: #fff;
+}
+
+.sl-step.done .sl-step-num {
+  background: var(--green);
+  border-color: var(--green);
+  color: #fff;
+}
+
+.sl-step-label {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 400;
+  letter-spacing: 0.3px;
+}
+
+.sl-step.active .sl-step-label {
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 500;
+}
+
+.sl-step.done .sl-step-label {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.sl-step-connector {
+  width: 2px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.12);
+  margin-left: 15px;
+  border-radius: 99px;
+}
+
+.sl-step-connector.done {
+  background: var(--green);
+  opacity: 0.5;
+}
+
+/* ── Tab switcher (Login / Register) ── */
+.sl-tab-row {
+  display: flex;
+  background: var(--cream);
+  border-radius: 12px;
+  padding: 4px;
+  gap: 4px;
+  margin-bottom: 24px;
+}
+
+.sl-tab {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: transparent;
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sl-tab.active {
+  background: #fff;
+  color: var(--ink);
+  box-shadow: 0 2px 8px rgba(28, 25, 23, 0.1);
+}
+
+/* ── Switch hint below form ── */
+.sl-switch-hint {
+  text-align: center;
+  margin-top: 18px;
+  font-size: 13.5px;
+  color: var(--muted);
+}
+
+.sl-switch-btn {
+  background: none;
+  border: none;
+  color: var(--rose);
+  font-size: 13.5px;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.sl-switch-btn:hover {
+  color: var(--rose-dk);
+}
+
+/* ── Payment page specific ── */
+.sp-amount-box {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  background: linear-gradient(135deg, #fdf6f4, #faf4ef);
+  border: 1.5px solid rgba(201, 137, 122, 0.25);
+  border-radius: 14px;
+  padding: 20px 22px;
+  margin-bottom: 24px;
+}
+
+.sp-amount-left {
+  flex-shrink: 0;
+  border-right: 1px solid rgba(201, 137, 122, 0.2);
+  padding-right: 20px;
+  margin-right: 4px;
+}
+
+.sp-amount-label {
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.sp-amount-value {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--rose-dk);
+  line-height: 1;
+}
+
+.sp-amount-right {
+  flex: 1;
+}
+
+.sp-amount-note {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+/* ── Payment method selector ── */
+.sp-method-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.sp-method-btn {
+  padding: 10px 14px;
+  border: 1.5px solid var(--sand);
+  border-radius: 10px;
+  background: #fff;
+  font-size: 13.5px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 400;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.sp-method-btn:hover {
+  border-color: var(--rose);
+  color: var(--rose);
+}
+
+.sp-method-btn.active {
+  border-color: var(--rose);
+  background: rgba(201, 137, 122, 0.07);
+  color: var(--rose-dk);
+  font-weight: 500;
+}
+
+/* ── Logout link inside payment card ── */
+.sp-logout-link {
+  display: block;
+  width: 100%;
+  margin-top: 14px;
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  text-align: center;
+  transition: color 0.2s;
+}
+
+.sp-logout-link:hover {
+  color: var(--rose);
+}
